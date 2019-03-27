@@ -1,0 +1,129 @@
+-- @path compareMM=/compare2Ufamily/metamodels/compare.ecore
+-- @path UFamiliesMM=/compare2Ufamily/metamodels/UFamily.ecore
+
+
+module compare2Ufamily;
+create OUT : UFamiliesMM from IN : compareMM;
+
+-- ###################################################### HELPERS ###################################################### --
+
+helper def : checkUnconflictMatch (cf: compareMM!Match, name : String) : Boolean =
+	not cf.origin.oclIsUndefined() and
+	not cf.left.oclIsUndefined() and 
+	not cf.right.oclIsUndefined() and
+	name.toString().endsWith(cf.origin.oclType().name) and
+	cf.differences->select(
+		e | compareMM!AttributeChange.toString().endsWith(e.oclType().name))->size() = 0;
+
+helper def: changedAttributesLeft(cf: compareMM!Match) : Boolean =
+	(not cf.differences->select(e | e.source = #LEFT).debug()->select(
+		e | compareMM!AttributeChange.toString().endsWith(e.oclType().name))->isEmpty())
+		and 
+	(cf.differences->select(
+		e | not e.conflict.oclIsUndefined())->isEmpty());
+
+helper def: changedAttributesRight(cf: compareMM!Match) : Boolean =
+	(not cf.differences->select(e | e.source = #RIGHT)->select(
+		e | compareMM!AttributeChange.toString().endsWith(e.oclType().name))->isEmpty())
+		and 
+	(cf.differences->select(
+		e | not e.conflict.oclIsUndefined())->isEmpty());
+
+helper def: conflictingAttributes(cf: compareMM!Match) : Boolean =
+	(not cf.differences->select(
+		e | compareMM!AttributeChange.toString().endsWith(e.oclType().name))->isEmpty())
+		and 
+	(not cf.differences->select(
+		e | not e.conflict.oclIsUndefined())->isEmpty());
+
+
+helper def : addedElementLeft (cf: compareMM!Match, name : String) : Boolean =
+	cf.origin.oclIsUndefined() and
+	not cf.left.oclIsUndefined() and 
+	cf.right.oclIsUndefined() and
+	(name.toString().endsWith(cf.left.oclType().name));
+
+helper def : addedElementRight (cf: compareMM!Match, name : String) : Boolean =
+	cf.origin.oclIsUndefined() and
+	cf.left.oclIsUndefined() and 
+	not cf.right.oclIsUndefined()and
+	(name.toString().endsWith(cf.right.oclType().name));	
+	
+	
+helper def: getUnchangedElementsByNameCollection (cf: compareMM!Match, name : String) : Sequence(compareMM!Match) = 
+	cf.submatches->select(e | not e.origin.oclIsUndefined())
+				 ->select(e | cf.origin.refGetValue(name) = e.origin.eContainer().refGetValue(name));
+
+helper def: getUnchangedElementsByNameSingle (cf: compareMM!Match, name : String) : compareMM!Match = 
+	cf.submatches->select(e | not e.origin.oclIsUndefined())
+				 ->select(e | cf.origin.refGetValue(name) = e.origin.eContainer().refGetValue(name))
+				 ->first();
+
+helper def: getAddedLeftCollection (cf: compareMM!Match, name : String) : Sequence(compareMM!Match) = 
+	cf.submatches->select(e | not e.left.oclIsUndefined())
+				 ->select(e | cf.left.refGetValue(name) = e.left.eContainer().refGetValue(name));
+
+helper def: getAddedRightCollection (cf: compareMM!Match, name : String) : Sequence(compareMM!Match) = 
+	cf.submatches->select(e | not e.right.oclIsUndefined())
+				 ->select(e | cf.right.refGetValue(name) = e.right.eContainer().refGetValue(name));
+
+helper def : getAttributeOrigin (Match : compareMM!Match, 
+						    Attribute:String) : String =										 	
+	Match.origin.refGetValue(Attribute);
+
+helper def : getAttribute (Match : compareMM!Match, 
+						    Attribute:String, direction : String) : String =		
+	Match.refGetValue(direction).refGetValue(Attribute);
+
+--	Sequence{};
+helper def: getAttributeChanged(match : compareMM!Match, name: String, direction : String) : OclAny =
+	match.differences->select(e | e.attribute.name = name).first().eContainer().refGetValue(direction).refGetValue(name);
+
+-- ##################################################################################################################### --
+
+-- ####################################################### RULES ####################################################### --
+
+rule match2member {
+	from
+		match: compareMM!Match ( thisModule.checkUnconflictMatch(match, UFamiliesMM!Member) )
+
+	to
+		f: UFamiliesMM!Member (
+			firstName <- thisModule.getAttributeOrigin(match, 'firstName'),
+			age <- thisModule.getAttributeOrigin(match, 'age'),
+			relatives <- thisModule.getAttributeOrigin(match, 'relatives')
+		)
+} 
+
+
+rule match2familyRegistry {
+	from
+		compare : compareMM!Match (thisModule.checkUnconflictMatch(compare, UFamiliesMM!FamilyRegistry))
+	to 
+		uFamilies : UFamiliesMM!FamilyRegistry (
+			families <- thisModule.getUnchangedElementsByNameSingle(compare,'families')
+		)
+}
+
+
+rule match2family {
+	from
+		compare : compareMM!Match (thisModule.checkUnconflictMatch(compare, UFamiliesMM!Family))
+	to 
+		uFamilies : UFamiliesMM!Family (
+			lastName <- thisModule.getAttributeOrigin(compare, 'lastName'),
+			address <- thisModule.getAttributeOrigin(compare, 'address'),
+			
+			father <- thisModule.getUnchangedElementsByNameSingle(compare,'father'),
+			mother <- thisModule.getUnchangedElementsByNameSingle(compare,'mother'),
+			
+			sons <- thisModule.getUnchangedElementsByNameCollection(compare,'sons')
+		)
+}
+
+
+
+
+
+
+-- ##################################################################################################################### --
