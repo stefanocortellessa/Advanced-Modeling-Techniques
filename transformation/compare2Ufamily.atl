@@ -68,6 +68,11 @@ helper def: getAddedLeftCollection (cf: compareMM!Match, name : String) : Sequen
 	cf.submatches->select(e | not e.left.oclIsUndefined())
 				 ->select(e | cf.left.refGetValue(name).includes(e.left));
 
+helper def: getAddedRightSingle (cf: compareMM!Match, name : String) : Sequence(compareMM!Match) = 
+	cf.submatches->select(e | not e.left.oclIsUndefined())
+				 ->select(e | cf.right.refGetValue(name) = e.right.eContainer().refGetValue(name))
+				 ->first();
+
 helper def: getAddedRightCollection (cf: compareMM!Match, name : String) : Sequence(compareMM!Match) = 
 	cf.submatches->select(e | not e.right.oclIsUndefined())
 				 ->select(e | cf.right.refGetValue(name).includes(e.right));
@@ -86,7 +91,7 @@ helper def: getAttributeChanged(match : compareMM!Match, name: String, direction
 
 -- ####################################################### RULES ####################################################### --
 
------------------------------------- Conservatives ------------------------------------
+------------------------------------ Match ------------------------------------
 rule match2member {
   from
     compare: compareMM!Match ( thisModule.checkUnconflictMatch(compare, 'Member') )
@@ -213,6 +218,7 @@ rule match2uFamily {
 
 
 ------------------------------------ Added Left ------------------------------------
+
 rule addedLeft2member {
   from
     compare: compareMM!Match ( thisModule.addedElementLeft(compare, 'Member') )
@@ -306,4 +312,99 @@ rule addedLeft2uFamily {
     )
 }
 
+
+------------------------------------ Added Right ------------------------------------
+
+rule addedRight2member {
+  from
+    compare: compareMM!Match ( thisModule.addedElementRight(compare, 'Member') )
+
+  to
+    f: UFamiliesMM!Member (
+    	
+      --attributes
+      firstName <- thisModule.getAttribute(compare, 'firstName', 'right'),
+      age <- thisModule.getAttribute(compare, 'age', 'right'), 
+	  
+	  --relations
+      relatives <- thisModule.getAddedRightSingle(compare,'relatives')
+    )
+} 
+
+
+rule addedRight2familyRegistry {
+  from
+    compare : compareMM!Match (thisModule.addedElementRight(compare, 'FamilyRegistry'))
+  to 
+    uFamilies : UFamiliesMM!FamilyRegistry (
+    	
+      --relations
+      families <- thisModule.getAddedRightCollection(compare,'families')
+    )
+}
+
+
+rule addedRight2family {
+  from
+    compare : compareMM!Match (thisModule.addedElementRight(compare, 'Family'))
+  to 
+    uFamilies : UFamiliesMM!Family (
+    	
+      --attributes
+      lastName <- thisModule.getAttribute(compare, 'lastName', 'right'),
+      address <- thisModule.getAttribute(compare, 'address', 'right'),      
+      father <- thisModule.getAddedRightSingle(compare,'father'),
+      mother <- thisModule.getAddedRightSingle(compare,'mother'),
+	  
+      --relations
+      sons <- thisModule.getAddedRightCollection(compare,'sons'),
+      daughters <- thisModule.getAddedRightCollection(compare,'daughters'),
+      links <- thisModule.getAddedRightCollection(compare,'links')
+    )
+}
+
+
+rule addedRight2uMember {
+	from
+		compare: compareMM!Match ( thisModule.addedElementRight(compare, 'uMember') )
+	to
+		f: UFamiliesMM!uMember (
+			
+			--relations
+			name <- thisModule.getAttribute(compare, 'name', 'right'),
+			uleft <-  thisModule.getAddedRightCollection(compare,'uleft'),
+			uright <-  thisModule.getAddedRightCollection(compare,'uright'),
+			upoint <- thisModule.getAddedRightCollection(compare,'upoint')
+		)
+} 
+
+
+rule addedRight2uFamilyRegistry {
+  from
+    compare : compareMM!Match (thisModule.addedElementRight(compare, 'uFamilyRegistry'))
+  to 
+    uFamilies : UFamiliesMM!uFamilyRegistry (
+    	
+      --relations
+	  name <- thisModule.getAttribute(compare, 'name', 'right'),
+      uleft <-  thisModule.getAddedRightCollection(compare,'uleft'),
+      uright <-  thisModule.getAddedRightCollection(compare,'uright'),
+      upoint <- thisModule.getAddedRightCollection(compare,'upoint')
+    )
+}
+
+
+rule addedRight2uFamily {
+  from
+    compare : compareMM!Match (thisModule.addedElementRight(compare, 'uFamily'))
+  to 
+    uFamilies : UFamiliesMM!uFamily (
+    	
+      --relations
+	  name <- thisModule.getAttribute(compare, 'name', 'right'),
+      uleft <-  thisModule.getAddedRightCollection(compare,'uleft'),
+      uright <-  thisModule.getAddedRightCollection(compare,'uright'),
+      upoint <- thisModule.getAddedRightCollection(compare,'upoint')
+    )
+}
 -- ##################################################################################################################### --
