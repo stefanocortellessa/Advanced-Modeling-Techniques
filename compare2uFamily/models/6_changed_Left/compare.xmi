@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="ASCII"?>
+<compare:Comparison xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:compare="http://www.eclipse.org/emf/compare" threeWay="true">
+  <matchedResources leftURI="platform:/resource/compare2uFamily/models/6_changed_Left/FamilyRegistry_1_L.xmi"/>
+  <matchedResources rightURI="platform:/resource/compare2uFamily/models/6_changed_Left/FamilyRegistry_1_R.xmi"/>
+  <matchedResources originURI="platform:/resource/compare2uFamily/models/6_changed_Left/FamilyRegistry_1_O.xmi"/>
+  <matches>
+    <submatches>
+      <submatches>
+        <left href="platform:/resource/compare2uFamily/models/6_changed_Left/FamilyRegistry_1_L.xmi#//@families.0/@sons.0"/>
+        <right href="platform:/resource/compare2uFamily/models/6_changed_Left/FamilyRegistry_1_R.xmi#//@families.0/@sons.0"/>
+        <origin href="platform:/resource/compare2uFamily/models/6_changed_Left/FamilyRegistry_1_O.xmi#//@families.0/@sons.0"/>
+      </submatches>
+      <submatches>
+        <differences xsi:type="compare:ReferenceChange" kind="CHANGE">
+          <reference href="http://it.univaq.disim/uncertainty.ufamily#//Member/relatives"/>
+          <value href="platform:/resource/compare2uFamily/models/6_changed_Left/FamilyRegistry_1_L.xmi#//@families.0/@father"/>
+        </differences>
+        <left href="platform:/resource/compare2uFamily/models/6_changed_Left/FamilyRegistry_1_L.xmi#//@families.0/@sons.1"/>
+        <right href="platform:/resource/compare2uFamily/models/6_changed_Left/FamilyRegistry_1_R.xmi#//@families.0/@sons.1"/>
+        <origin href="platform:/resource/compare2uFamily/models/6_changed_Left/FamilyRegistry_1_O.xmi#//@families.0/@sons.1"/>
+      </submatches>
+      <submatches>
+        <left href="platform:/resource/compare2uFamily/models/6_changed_Left/FamilyRegistry_1_L.xmi#//@families.0/@mother"/>
+        <right href="platform:/resource/compare2uFamily/models/6_changed_Left/FamilyRegistry_1_R.xmi#//@families.0/@mother"/>
+        <origin href="platform:/resource/compare2uFamily/models/6_changed_Left/FamilyRegistry_1_O.xmi#//@families.0/@mother"/>
+      </submatches>
+      <submatches>
+        <left href="platform:/resource/compare2uFamily/models/6_changed_Left/FamilyRegistry_1_L.xmi#//@families.0/@father"/>
+        <right href="platform:/resource/compare2uFamily/models/6_changed_Left/FamilyRegistry_1_R.xmi#//@families.0/@father"/>
+        <origin href="platform:/resource/compare2uFamily/models/6_changed_Left/FamilyRegistry_1_O.xmi#//@families.0/@father"/>
+      </submatches>
+      <left href="platform:/resource/compare2uFamily/models/6_changed_Left/FamilyRegistry_1_L.xmi#//@families.0"/>
+      <right href="platform:/resource/compare2uFamily/models/6_changed_Left/FamilyRegistry_1_R.xmi#//@families.0"/>
+      <origin href="platform:/resource/compare2uFamily/models/6_changed_Left/FamilyRegistry_1_O.xmi#//@families.0"/>
+    </submatches>
+    <left href="platform:/resource/compare2uFamily/models/6_changed_Left/FamilyRegistry_1_L.xmi#/"/>
+    <right href="platform:/resource/compare2uFamily/models/6_changed_Left/FamilyRegistry_1_R.xmi#/"/>
+    <origin href="platform:/resource/compare2uFamily/models/6_changed_Left/FamilyRegistry_1_O.xmi#/"/>
+  </matches>
+</compare:Comparison>
