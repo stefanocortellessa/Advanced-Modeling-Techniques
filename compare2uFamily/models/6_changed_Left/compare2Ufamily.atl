@@ -252,5 +252,61 @@ rule changeLeft2member {
 	}
 }
 
+------------------------------------ Changed Right ------------------------------------
 
------------------------------------- Changed Left ------------------------------------
+rule changeRight2familyRegistry {
+  from
+   compare: compareMM!Match ( thisModule.changedAttributesLeft(compare, 'FamilyRegistry') or thisModule.changedReferenceLeft(compare, 'FamilyRegistry'))
+  to 
+   f: UFamiliesMM!FamilyRegistry (      
+    
+      --relations
+      families <- thisModule.getReference(compare,'families', 'right')
+    )
+	do {
+		compare.debug('refChanged_familyRegistry');
+	}
+}
+
+
+rule changeRight2family {
+  from
+   compare: compareMM!Match ( thisModule.changedAttributesLeft(compare, 'Family') or thisModule.changedReferenceLeft(compare, 'Family'))
+  to 
+   f: UFamiliesMM!Family (
+ 
+      --attributes
+      address <- thisModule.getAttribute(compare, 'address', 'right'),
+      lastName <- thisModule.getAttribute(compare, 'lastName', 'right'),
+      
+    
+      --relations
+	  father <- thisModule.getReference(compare,'father', 'right'),
+	  mother <- thisModule.getReference(compare,'mother', 'right'),
+	  sons <- thisModule.getReference(compare,'sons', 'right'),
+	  daughters <- thisModule.getReference(compare,'daughters', 'right'),
+      links <- thisModule.getReference(compare,'links', 'right')
+    )
+	do {
+		compare.debug('refChanged_family');
+	}
+}
+
+rule changeRight2member {
+  from
+   compare: compareMM!Match ( thisModule.changedAttributesLeft(compare, 'Member') or thisModule.changedReferenceLeft(compare, 'Member'))
+  to 
+   f: UFamiliesMM!Member (
+ 
+      --attributes
+      age <- thisModule.getAttribute(compare, 'age', 'right'),
+      firstName <- thisModule.getAttribute(compare, 'firstName', 'right'),
+      
+    
+      --relations
+      relatives <- thisModule.getReference(compare,'relatives', 'right')
+    )
+	do {
+		compare.debug('attrChanged_member');
+	}
+}
