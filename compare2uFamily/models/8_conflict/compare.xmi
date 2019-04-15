@@ -11,17 +11,11 @@
         <origin href="platform:/resource/compare2uFamily/models/8_conflict/FamilyRegistry_1_O.xmi#//@families.0/@sons.0"/>
       </submatches>
       <submatches>
-        <differences xsi:type="compare:ReferenceChange" kind="CHANGE" conflict="//@conflicts.0">
+        <differences xsi:type="compare:ReferenceChange" requires="//@matches.0/@submatches.0/@differences.0" kind="CHANGE">
           <reference href="http://it.univaq.disim/uncertainty.ufamily#//Member/relatives"/>
           <value href="platform:/resource/compare2uFamily/models/8_conflict/FamilyRegistry_1_L.xmi#//@families.0/@mother"/>
         </differences>
-        <differences xsi:type="compare:ReferenceChange" kind="CHANGE" source="RIGHT" conflict="//@conflicts.0">
-          <reference href="http://it.univaq.disim/uncertainty.ufamily#//Member/relatives"/>
-          <value href="platform:/resource/compare2uFamily/models/8_conflict/FamilyRegistry_1_R.xmi#//@families.0/@sons.0"/>
-        </differences>
         <left href="platform:/resource/compare2uFamily/models/8_conflict/FamilyRegistry_1_L.xmi#//@families.0/@sons.1"/>
-        <right href="platform:/resource/compare2uFamily/models/8_conflict/FamilyRegistry_1_R.xmi#//@families.0/@sons.1"/>
-        <origin href="platform:/resource/compare2uFamily/models/8_conflict/FamilyRegistry_1_O.xmi#//@families.0/@sons.1"/>
       </submatches>
       <submatches>
         <left href="platform:/resource/compare2uFamily/models/8_conflict/FamilyRegistry_1_L.xmi#//@families.0/@mother"/>
@@ -33,6 +27,40 @@
         <right href="platform:/resource/compare2uFamily/models/8_conflict/FamilyRegistry_1_R.xmi#//@families.0/@father"/>
         <origin href="platform:/resource/compare2uFamily/models/8_conflict/FamilyRegistry_1_O.xmi#//@families.0/@father"/>
       </submatches>
+      <submatches>
+        <differences xsi:type="compare:ReferenceChange" requires="//@matches.0/@submatches.0/@differences.1" kind="CHANGE" source="RIGHT">
+          <reference href="http://it.univaq.disim/uncertainty.ufamily#//Member/relatives"/>
+          <value href="platform:/resource/compare2uFamily/models/8_conflict/FamilyRegistry_1_R.xmi#//@families.0/@sons.0"/>
+        </differences>
+        <right href="platform:/resource/compare2uFamily/models/8_conflict/FamilyRegistry_1_R.xmi#//@families.0/@sons.1"/>
+      </submatches>
+      <submatches>
+        <differences xsi:type="compare:ReferenceChange" requiredBy="//@matches.0/@submatches.0/@differences.2" kind="CHANGE" conflict="//@conflicts.0">
+          <reference href="http://it.univaq.disim/uncertainty.ufamily#//Member/relatives"/>
+          <value href="platform:/resource/compare2uFamily/models/8_conflict/FamilyRegistry_1_O.xmi#//@families.0/@father"/>
+        </differences>
+        <differences xsi:type="compare:ReferenceChange" requiredBy="//@matches.0/@submatches.0/@differences.3" kind="CHANGE" source="RIGHT" conflict="//@conflicts.0">
+          <reference href="http://it.univaq.disim/uncertainty.ufamily#//Member/relatives"/>
+          <value href="platform:/resource/compare2uFamily/models/8_conflict/FamilyRegistry_1_O.xmi#//@families.0/@father"/>
+        </differences>
+        <origin href="platform:/resource/compare2uFamily/models/8_conflict/FamilyRegistry_1_O.xmi#//@families.0/@sons.1"/>
+      </submatches>
+      <differences xsi:type="compare:ReferenceChange" requiredBy="//@matches.0/@submatches.0/@submatches.1/@differences.0">
+        <reference href="http://it.univaq.disim/uncertainty.ufamily#//Family/sons"/>
+        <value href="platform:/resource/compare2uFamily/models/8_conflict/FamilyRegistry_1_L.xmi#//@families.0/@sons.1"/>
+      </differences>
+      <differences xsi:type="compare:ReferenceChange" requiredBy="//@matches.0/@submatches.0/@submatches.4/@differences.0" source="RIGHT">
+        <reference href="http://it.univaq.disim/uncertainty.ufamily#//Family/sons"/>
+        <value href="platform:/resource/compare2uFamily/models/8_conflict/FamilyRegistry_1_R.xmi#//@families.0/@sons.1"/>
+      </differences>
+      <differences xsi:type="compare:ReferenceChange" requires="//@matches.0/@submatches.0/@submatches.5/@differences.0" kind="DELETE" conflict="//@conflicts.1">
+        <reference href="http://it.univaq.disim/uncertainty.ufamily#//Family/sons"/>
+        <value href="platform:/resource/compare2uFamily/models/8_conflict/FamilyRegistry_1_O.xmi#//@families.0/@sons.1"/>
+      </differences>
+      <differences xsi:type="compare:ReferenceChange" requires="//@matches.0/@submatches.0/@submatches.5/@differences.1" kind="DELETE" source="RIGHT" conflict="//@conflicts.1">
+        <reference href="http://it.univaq.disim/uncertainty.ufamily#//Family/sons"/>
+        <value href="platform:/resource/compare2uFamily/models/8_conflict/FamilyRegistry_1_O.xmi#//@families.0/@sons.1"/>
+      </differences>
       <left href="platform:/resource/compare2uFamily/models/8_conflict/FamilyRegistry_1_L.xmi#//@families.0"/>
       <right href="platform:/resource/compare2uFamily/models/8_conflict/FamilyRegistry_1_R.xmi#//@families.0"/>
       <origin href="platform:/resource/compare2uFamily/models/8_conflict/FamilyRegistry_1_O.xmi#//@families.0"/>
@@ -41,5 +69,6 @@
     <right href="platform:/resource/compare2uFamily/models/8_conflict/FamilyRegistry_1_R.xmi#/"/>
     <origin href="platform:/resource/compare2uFamily/models/8_conflict/FamilyRegistry_1_O.xmi#/"/>
   </matches>
-  <conflicts differences="//@matches.0/@submatches.0/@submatches.1/@differences.0 //@matches.0/@submatches.0/@submatches.1/@differences.1"/>
+  <conflicts kind="PSEUDO" differences="//@matches.0/@submatches.0/@submatches.5/@differences.0 //@matches.0/@submatches.0/@submatches.5/@differences.1"/>
+  <conflicts kind="PSEUDO" differences="//@matches.0/@submatches.0/@differences.2 //@matches.0/@submatches.0/@differences.3"/>
 </compare:Comparison>

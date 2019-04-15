@@ -4,11 +4,11 @@
     <sons xsi:type="Families:Member" firstName="Stefano" age="25"/>
   </families>
   <families xsi:type="uncertainty:uFamily" utype="OR">
-    <uleft lastName="Cortellessa" address="Via Roma 3"/>
+    <uleft lastName="Cortellessa" address="Via Roma 2"/>
     <uright lastName="Cortellessa" address="Via Roma 3">
       <sons xsi:type="Families:Member" firstName="Giovanni" age="29"/>
       <sons xsi:type="Families:Member" firstName="Stefano" age="24">
-        <relatives xsi:type="Families:Member" href="../9_nested_conflict/FamilyRegistry_1_O.xmi#//@families.0/@father"/>
+        <relatives xsi:type="Families:Member" href="FamilyRegistry_1_O.xmi#//@families.0/@father"/>
       </sons>
       <mother xsi:type="Families:Member" firstName="Paola" age="53"/>
       <father xsi:type="Families:Member" firstName="Maurizio" age="56"/>
