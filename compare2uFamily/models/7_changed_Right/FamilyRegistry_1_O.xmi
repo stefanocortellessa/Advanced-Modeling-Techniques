@@ -7,14 +7,13 @@
   <families
       xsi:type="Families:Family"
       lastName="Cortellessa"
-      address="Via Roma 2">
+      address="Via Roma">
     <sons xsi:type="Families:Member"
         firstName="Giovanni"
         age="29"/>
     <sons xsi:type="Families:Member"
         firstName="Stefano"
-        age="24"
-        relatives="//@families.0/@father"/>
+        age="24"/>
     <mother
         xsi:type="Families:Member"
         firstName="Paola"
@@ -24,7 +23,4 @@
         firstName="Maurizio"
         age="56"/>
   </families>
-  <families
-      xsi:type="Families:Family"
-      lastName="Di Francesco"/>
 </Families:FamilyRegistry>

@@ -34,4 +34,8 @@
         firstName="Maurizio"
         age="56"/>
   </families>
+  <families
+      xsi:type="Families:Family"
+      lastName="Di Francesco"
+      address="Via Bologna"/>
 </Families:FamilyRegistry>

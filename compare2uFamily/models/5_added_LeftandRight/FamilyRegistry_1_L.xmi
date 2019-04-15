@@ -17,6 +17,9 @@
         age="24"/>
     <sons xsi:type="uncertainty:uMember"
         name="Luca"/>
+    <sons xsi:type="Families:Member"
+        firstName="Davide"
+        age="30"/>
     <daughters
         xsi:type="uncertainty:uMember"
         name="Lucia"/>
