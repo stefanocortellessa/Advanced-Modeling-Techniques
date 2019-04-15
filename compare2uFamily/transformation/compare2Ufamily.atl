@@ -16,7 +16,7 @@ helper def : checkUnconflictMatch (cf: compareMM!Match, name : String) : Boolean
 		e | compareMM!AttributeChange.toString().endsWith(e.oclType().name))->size() = 0;
 
 helper def: changedAttributesLeft(cf: compareMM!Match) : Boolean =
-	(not cf.differences->select(e | e.source = #LEFT).debug()->select(
+	(not cf.differences->select(e | e.source = #LEFT)->select(
 		e | compareMM!AttributeChange.toString().endsWith(e.oclType().name))->isEmpty())
 		and 
 	(cf.differences->select(
@@ -46,7 +46,7 @@ helper def : addedElementLeft (cf: compareMM!Match, name : String) : Boolean =
 helper def : addedElementRight (cf: compareMM!Match, name : String) : Boolean =
 	cf.origin.oclIsUndefined() and
 	cf.left.oclIsUndefined() and 
-	not cf.right.oclIsUndefined()and
+	not cf.right.oclIsUndefined() and
 	(name = cf.right.oclType().name);	
 	
 	
@@ -87,11 +87,36 @@ helper def : getAttribute (Match : compareMM!Match,
 helper def: getAttributeChanged(match : compareMM!Match, name: String, direction : String) : OclAny =
 	match.differences->select(e | e.attribute.name = name).first().eContainer().refGetValue(direction).refGetValue(name);
 
--- ##################################################################################################################### --
+------------------------------------ References ------------------------------------
+helper def : getReferenceOrigin (Match : compareMM!Match, 
+					Reference:String) : String = Match.origin.refGetValue(Reference);
+
+helper def : getReference (Match : compareMM!Match, 
+					Reference:String, direction : String) : String = Match.refGetValue(direction).refGetValue(Reference);
+
+helper def: changedReferenceLeft(cf: compareMM!Match, name: String) : Boolean =
+	(not cf.differences->select(e | e.source = #LEFT)->select(
+		e | compareMM!ReferenceChange.toString().endsWith(e.oclType().name))->isEmpty())
+		and 
+	(cf.differences->select(
+		e | not e.conflict.oclIsUndefined())->isEmpty())
+		and
+	(name = cf.left.oclType().name);
+
+helper def: changedReferenceRight(cf: compareMM!Match, name:String) : Boolean =
+	(not cf.differences->select(e | e.source = #RIGHT)->select(
+		e | compareMM!ReferenceChange.toString().endsWith(e.oclType().name))->isEmpty())
+		and 
+	(cf.differences->select(
+		e | not e.conflict.oclIsUndefined())->isEmpty())and
+	(name = cf.right.oclType().name);
+------------------------------------ References ------------------------------------
+
+-- ###################################################### HELPERS ###################################################### --
 
 -- ####################################################### RULES ####################################################### --
 
------------------------------------- Match ------------------------------------
+------------------------------------ Matches ------------------------------------
 rule match2member {
   from
     compare: compareMM!Match ( thisModule.checkUnconflictMatch(compare, 'Member') )
@@ -101,7 +126,7 @@ rule match2member {
       --attributes
       firstName <- thisModule.getAttributeOrigin(compare, 'firstName'),
       age <- thisModule.getAttributeOrigin(compare, 'age'),
-      relatives <- thisModule.getUnchangedElementsByNameSingle(compare,'relatives')
+      relatives <- thisModule.getReferenceOrigin(compare,'relatives')
     )
 } 
 
@@ -146,6 +171,10 @@ rule match2family {
     )
 }
 
+------------------------------------ Matches ------------------------------------
+
+
+------------------------------------ Matches 4 uMembers------------------------------------
 
 rule match2uMember {
 	from
@@ -215,6 +244,8 @@ rule match2uFamily {
 							   thisModule.getAddedRightCollection(compare,'upoint'))
     )
 }
+
+------------------------------------ Matches 4 uMembers------------------------------------
 
 
 ------------------------------------ Added Left ------------------------------------
@@ -312,6 +343,8 @@ rule addedLeft2uFamily {
     )
 }
 
+------------------------------------ Added Left ------------------------------------
+
 
 ------------------------------------ Added Right ------------------------------------
 
@@ -407,4 +440,42 @@ rule addedRight2uFamily {
       upoint <- thisModule.getAddedRightCollection(compare,'upoint')
     )
 }
--- ##################################################################################################################### --
+
+------------------------------------ Added Right ------------------------------------
+
+
+------------------------------------ Changed Left ------------------------------------
+
+rule changeLeft2member {
+  from
+   compare: compareMM!Match ( thisModule.changedAttributesLeft(compare) )
+  to 
+   f: UFamiliesMM!Member (
+ 
+      --attributes
+      age <- thisModule.getAttribute(compare, 'age', 'left'),
+      firstName <- thisModule.getAttribute(compare, 'firstName', 'left'),
+      
+    
+      --relations
+      relatives <- thisModule.getReference(compare,'relatives', 'left')
+    )
+}
+
+
+rule changeRefLeft2member {
+  from
+   compare: compareMM!Match ( thisModule.changedReferenceLeft(compare, 'member'))
+  to 
+   f: UFamiliesMM!Member (
+ 
+      --attributes
+      age <- thisModule.getAttribute(compare, 'age', 'left'),
+      firstName <- thisModule.getAttribute(compare, 'firstName', 'left'),
+      
+    
+      --relations
+      relatives <- thisModule.getReference(compare,'relatives', 'left')
+    )
+}
+------------------------------------ Changed Left ------------------------------------
