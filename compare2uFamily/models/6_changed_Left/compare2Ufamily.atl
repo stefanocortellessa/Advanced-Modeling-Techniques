@@ -256,7 +256,7 @@ rule changeLeft2member {
 
 rule changeRight2familyRegistry {
   from
-   compare: compareMM!Match ( thisModule.changedAttributesLeft(compare, 'FamilyRegistry') or thisModule.changedReferenceLeft(compare, 'FamilyRegistry'))
+   compare: compareMM!Match ( thisModule.changedAttributesRight(compare, 'FamilyRegistry') or thisModule.changedReferenceRight(compare, 'FamilyRegistry'))
   to 
    f: UFamiliesMM!FamilyRegistry (      
     
@@ -271,7 +271,7 @@ rule changeRight2familyRegistry {
 
 rule changeRight2family {
   from
-   compare: compareMM!Match ( thisModule.changedAttributesLeft(compare, 'Family') or thisModule.changedReferenceLeft(compare, 'Family'))
+   compare: compareMM!Match ( thisModule.changedAttributesRight(compare, 'Family') or thisModule.changedReferenceRight(compare, 'Family'))
   to 
    f: UFamiliesMM!Family (
  
@@ -294,7 +294,7 @@ rule changeRight2family {
 
 rule changeRight2member {
   from
-   compare: compareMM!Match ( thisModule.changedAttributesLeft(compare, 'Member') or thisModule.changedReferenceLeft(compare, 'Member'))
+   compare: compareMM!Match ( thisModule.changedAttributesRight(compare, 'Member') or thisModule.changedReferenceRight(compare, 'Member'))
   to 
    f: UFamiliesMM!Member (
  
