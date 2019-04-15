@@ -35,6 +35,13 @@ helper def: conflictingAttributes(cf: compareMM!Match) : Boolean =
 	(not cf.differences->select(
 		e | not e.conflict.oclIsUndefined())->isEmpty());
 
+helper def: conflictingReference(cf: compareMM!Match) : Boolean =
+	(not cf.differences->select(
+		e | compareMM!ReferenceChange.toString().endsWith(e.oclType().name))->isEmpty())
+		and 
+	(not cf.differences->select(
+		e | not e.conflict.oclIsUndefined())->isEmpty());
+
 
 helper def : addedElementLeft (cf: compareMM!Match, name : String) : Boolean =
 	cf.origin.oclIsUndefined() and
@@ -587,7 +594,7 @@ rule changeRight2member {
 
 rule ConflictAMember {
 	from
-		match: compareMM!Match (thisModule.conflictingAttributes(match))
+		match: compareMM!Match (thisModule.conflictingAttributes(match) or thisModule.conflictingReference(match))
 	to
 		f: UFamiliesMM!uMember(
 			uleft <- left,
