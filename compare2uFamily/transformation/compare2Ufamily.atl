@@ -128,6 +128,9 @@ rule match2member {
       age <- thisModule.getAttributeOrigin(compare, 'age'),
       relatives <- thisModule.getReferenceOrigin(compare,'relatives')
     )
+	do {
+		compare.debug('Member_match');
+	}
 } 
 
 
@@ -141,6 +144,9 @@ rule match2familyRegistry {
 								   thisModule.getAddedLeftCollection(compare,'families'))->append(
 								   thisModule.getAddedRightCollection(compare,'families'))
     )
+	do {
+		compare.debug('Registry_match');
+	}
 }
 
 
@@ -153,10 +159,11 @@ rule match2family {
       --attributes
       lastName <- thisModule.getAttributeOrigin(compare, 'lastName'),
       address <- thisModule.getAttributeOrigin(compare, 'address'),      
-      father <- thisModule.getUnchangedElementsByNameSingle(compare,'father'),
-      mother <- thisModule.getUnchangedElementsByNameSingle(compare,'mother'),
+      
 	  
       --relations
+	  father <- thisModule.getUnchangedElementsByNameSingle(compare,'father'),
+      mother <- thisModule.getUnchangedElementsByNameSingle(compare,'mother'),
       sons <- thisModule.getUnchangedElementsByNameCollection(compare,'sons')->append(
 						   thisModule.getAddedLeftCollection(compare,'sons'))->append(
 						   thisModule.getAddedRightCollection(compare,'sons')),
@@ -169,11 +176,12 @@ rule match2family {
 							thisModule.getAddedLeftCollection(compare,'links'))->append(
 							thisModule.getAddedRightCollection(compare,'links'))
     )
+	do {
+		compare.debug('match_Family');
+	}
 }
 
------------------------------------- Matches ------------------------------------
-
-
+----------------------------------------- Matches -----------------------------------------
 ------------------------------------ Matches 4 uMembers------------------------------------
 
 rule match2uMember {
@@ -246,8 +254,6 @@ rule match2uFamily {
 }
 
 ------------------------------------ Matches 4 uMembers------------------------------------
-
-
 ------------------------------------ Added Left ------------------------------------
 
 rule addedLeft2member {
@@ -344,8 +350,6 @@ rule addedLeft2uFamily {
 }
 
 ------------------------------------ Added Left ------------------------------------
-
-
 ------------------------------------ Added Right ------------------------------------
 
 rule addedRight2member {
@@ -442,13 +446,58 @@ rule addedRight2uFamily {
 }
 
 ------------------------------------ Added Right ------------------------------------
-
-
 ------------------------------------ Changed Left ------------------------------------
+
+
+rule changeLeft2familyRegistry {
+  from
+   compare: compareMM!Match ( thisModule.changedAttributesLeft(compare, 'FamilyRegistry') or thisModule.changedReferenceLeft(compare, 'FamilyRegistry'))
+  to 
+   f: UFamiliesMM!FamilyRegistry (      
+    
+      --relations
+      families <- thisModule.getReference(compare,'families', 'left')
+    )
+	do {
+		compare.debug('Changed_familyRegistry');
+	}
+}
+
+
+rule changeLeft2family {
+  from
+   compare: compareMM!Match ( thisModule.changedAttributesLeft(compare, 'Family') or thisModule.changedReferenceLeft(compare, 'Family'))
+  to 
+   f: UFamiliesMM!Family (
+ 
+      --attributes
+      address <- thisModule.getAttribute(compare, 'address', 'left'),
+      lastName <- thisModule.getAttribute(compare, 'lastName', 'left'),
+      
+    
+      --relations
+	  father <- thisModule.getUnchangedElementsByNameSingle(compare,'father'),
+      mother <- thisModule.getUnchangedElementsByNameSingle(compare,'mother'),
+      sons <- thisModule.getUnchangedElementsByNameCollection(compare,'sons')->append(
+						   thisModule.getAddedLeftCollection(compare,'sons'))->append(
+						   thisModule.getAddedRightCollection(compare,'sons')),
+						  
+      daughters <- thisModule.getUnchangedElementsByNameCollection(compare,'daughters')->append(
+								thisModule.getAddedLeftCollection(compare,'daughters'))->append(
+								thisModule.getAddedRightCollection(compare,'daughters')),
+						  
+      links <- thisModule.getUnchangedElementsByNameCollection(compare,'links')->append(
+							thisModule.getAddedLeftCollection(compare,'links'))->append(
+							thisModule.getAddedRightCollection(compare,'links'))
+    )
+	do {
+		compare.debug('Changed_family');
+	}
+}
 
 rule changeLeft2member {
   from
-   compare: compareMM!Match ( thisModule.changedAttributesLeft(compare) )
+   compare: compareMM!Match ( thisModule.changedAttributesLeft(compare, 'Member') or thisModule.changedReferenceLeft(compare, 'Member'))
   to 
    f: UFamiliesMM!Member (
  
@@ -460,22 +509,67 @@ rule changeLeft2member {
       --relations
       relatives <- thisModule.getReference(compare,'relatives', 'left')
     )
+	do {
+		compare.debug('Changed_member');
+	}
 }
+------------------------------------ Changed Left -------------------------------------
+------------------------------------ Changed Right ------------------------------------
 
-
-rule changeRefLeft2member {
+rule changeRight2familyRegistry {
   from
-   compare: compareMM!Match ( thisModule.changedReferenceLeft(compare, 'member'))
+   compare: compareMM!Match ( thisModule.changedAttributesRight(compare, 'FamilyRegistry') or thisModule.changedReferenceRight(compare, 'FamilyRegistry'))
+  to 
+   f: UFamiliesMM!FamilyRegistry (      
+    
+      --relations
+      families <- thisModule.getReference(compare,'families', 'right')
+    )
+	do {
+		compare.debug('refChanged_familyRegistry');
+	}
+}
+
+
+rule changeRight2family {
+  from
+   compare: compareMM!Match ( thisModule.changedAttributesRight(compare, 'Family') or thisModule.changedReferenceRight(compare, 'Family'))
+  to 
+   f: UFamiliesMM!Family (
+ 
+      --attributes
+      address <- thisModule.getAttribute(compare, 'address', 'right'),
+      lastName <- thisModule.getAttribute(compare, 'lastName', 'right'),
+      
+    
+      --relations
+	  father <- thisModule.getReference(compare,'father', 'right'),
+	  mother <- thisModule.getReference(compare,'mother', 'right'),
+	  sons <- thisModule.getReference(compare,'sons', 'right'),
+	  daughters <- thisModule.getReference(compare,'daughters', 'right'),
+      links <- thisModule.getReference(compare,'links', 'right')
+    )
+	do {
+		compare.debug('refChanged_family');
+	}
+}
+
+rule changeRight2member {
+  from
+   compare: compareMM!Match ( thisModule.changedAttributesRight(compare, 'Member') or thisModule.changedReferenceRight(compare, 'Member'))
   to 
    f: UFamiliesMM!Member (
  
       --attributes
-      age <- thisModule.getAttribute(compare, 'age', 'left'),
-      firstName <- thisModule.getAttribute(compare, 'firstName', 'left'),
+      age <- thisModule.getAttribute(compare, 'age', 'right'),
+      firstName <- thisModule.getAttribute(compare, 'firstName', 'right'),
       
     
       --relations
-      relatives <- thisModule.getReference(compare,'relatives', 'left')
+      relatives <- thisModule.getReference(compare,'relatives', 'right')
     )
+	do {
+		compare.debug('attrChanged_member');
+	}
 }
------------------------------------- Changed Left ------------------------------------
+------------------------------------ Changed Right ------------------------------------
