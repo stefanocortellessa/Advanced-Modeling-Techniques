@@ -119,9 +119,7 @@ helper def: changedReferenceRight(cf: compareMM!Match, name: String): Boolean =
 ------------------------------------ Matches ------------------------------------
 rule match2member {
 	from
-		compare: compareMM!Match (
-			thisModule.checkUnconflictMatch(compare, 'Member')
-		)
+		compare: compareMM!Match ( thisModule.checkUnconflictMatch(compare, 'Member') )
 	to
 		f: UFamiliesMM!Member (
 			--attributes
@@ -152,9 +150,7 @@ rule match2familyRegistry {
 
 rule match2family {
 	from
-		compare: compareMM!Match (
-			thisModule.checkUnconflictMatch(compare, 'Family')
-		)
+		compare: compareMM!Match ( thisModule.checkUnconflictMatch(compare, 'Family') )
 	to
 		uFamilies: UFamiliesMM!Family (
 			--attributes
@@ -175,7 +171,7 @@ rule match2family {
 					append(thisModule.getAddedRightCollection(compare, 'links'))
 		)
 	do {
-		compare.debug('match_Family'); 
+		compare.debug('Family_match'); 
 	}
 }
 
@@ -183,9 +179,7 @@ rule match2family {
 ------------------------------------ Matches 4 -- uMembers------------------------------------
 rule match2uMember {
 	from
-		compare: compareMM!Match (
-			thisModule.checkUnconflictMatch(compare, 'uMember')
-		)
+		compare: compareMM!Match ( thisModule.checkUnconflictMatch(compare, 'uMember') )
 	to
 		f: UFamiliesMM!uMember (
 			--relations
@@ -200,13 +194,14 @@ rule match2uMember {
 					-> append(thisModule.getAddedLeftCollection(compare, 'upoint')) ->
 					append(thisModule.getAddedRightCollection(compare, 'upoint'))
 		)
+	do {
+		compare.debug('uMember_match'); 
+	}
 }
 
 rule match2uFamilyRegistry {
 	from
-		compare: compareMM!Match (
-			thisModule.checkUnconflictMatch(compare, 'uFamilyRegistry')
-		)
+		compare: compareMM!Match ( thisModule.checkUnconflictMatch(compare, 'uFamilyRegistry') )
 	to
 		uFamilies: UFamiliesMM!uFamilyRegistry (
 			--relations
@@ -221,13 +216,14 @@ rule match2uFamilyRegistry {
 					-> append(thisModule.getAddedLeftCollection(compare, 'upoint')) ->
 					append(thisModule.getAddedRightCollection(compare, 'upoint'))
 		)
+	do {
+		compare.debug('uFamilyRegistry_match'); 
+	}
 }
 
 rule match2uFamily {
 	from
-		compare: compareMM!Match (
-			thisModule.checkUnconflictMatch(compare, 'uFamily')
-		)
+		compare: compareMM!Match ( thisModule.checkUnconflictMatch(compare, 'uFamily') )
 	to
 		uFamilies: UFamiliesMM!uFamily (
 			--relations
@@ -242,15 +238,16 @@ rule match2uFamily {
 					-> append(thisModule.getAddedLeftCollection(compare, 'upoint')) ->
 					append(thisModule.getAddedRightCollection(compare, 'upoint'))
 		)
+	do {
+		compare.debug('uFamily_match'); 
+	}
 }
 
 ------------------------------------ Matches 4 -- uMembers------------------------------------
 ------------------------------------------ Added Left ----------------------------------------
 rule addedLeft2member {
 	from
-		compare: compareMM!Match (
-			thisModule.addedElementLeft(compare, 'Member')
-		)
+		compare: compareMM!Match ( thisModule.addedElementLeft(compare, 'Member') )
 	to
 		f: UFamiliesMM!Member (
 			--attributes
@@ -259,26 +256,27 @@ rule addedLeft2member {
 			--relations
 			relatives <- thisModule.getAddedLeftSingle(compare, 'relatives')
 		)
+	do {
+		compare.debug('Member_add_L'); 
+	}
 }
 
 rule addedLeft2familyRegistry {
 	from
-		compare: compareMM!Match (
-			thisModule.addedElementLeft(compare, 'FamilyRegistry')
-		)
+		compare: compareMM!Match ( thisModule.addedElementLeft(compare, 'FamilyRegistry') )
 	to
 		uFamilies: UFamiliesMM!FamilyRegistry (
 			--relations
-			families <- thisModule.getAddedLeftCollection(compare, 'families').
-					debug('familyRegistryADD')
+			families <- thisModule.getAddedLeftCollection(compare, 'families')
 		)
+	do {
+		compare.debug('FamilyRegistry_add_L'); 
+	}
 }
 
 rule addedLeft2family {
 	from
-		compare: compareMM!Match (
-			thisModule.addedElementLeft(compare, 'Family')
-		)
+		compare: compareMM!Match ( thisModule.addedElementLeft(compare, 'Family') )
 	to
 		uFamilies: UFamiliesMM!Family (
 			--attributes
@@ -292,14 +290,13 @@ rule addedLeft2family {
 			links <- thisModule.getAddedLeftCollection(compare, 'links')
 		)
 	do {
+		compare.debug('Family_add_L'); 
 	}
 }
 
 rule addedLeft2uMember {
 	from
-		compare: compareMM!Match (
-			thisModule.addedElementLeft(compare, 'uMember')
-		)
+		compare: compareMM!Match ( thisModule.addedElementLeft(compare, 'uMember') )
 	to
 		f: UFamiliesMM!uMember (
 			--relations
@@ -308,13 +305,14 @@ rule addedLeft2uMember {
 			uright <- thisModule.getAddedLeftCollection(compare, 'uright'),
 			upoint <- thisModule.getAddedLeftCollection(compare, 'upoint')
 		)
+	do {
+		compare.debug('uMember_add_L'); 
+	}
 }
 
 rule addedLeft2uFamilyRegistry {
 	from
-		compare: compareMM!Match (
-			thisModule.addedElementLeft(compare, 'uFamilyRegistry')
-		)
+		compare: compareMM!Match ( thisModule.addedElementLeft(compare, 'uFamilyRegistry') )
 	to
 		uFamilies: UFamiliesMM!uFamilyRegistry (
 			--relations
@@ -323,13 +321,14 @@ rule addedLeft2uFamilyRegistry {
 			uright <- thisModule.getAddedLeftCollection(compare, 'uright'),
 			upoint <- thisModule.getAddedLeftCollection(compare, 'upoint')
 		)
+	do {
+		compare.debug('uFamilyRegistry_add_L'); 
+	}
 }
 
 rule addedLeft2uFamily {
 	from
-		compare: compareMM!Match (
-			thisModule.addedElementLeft(compare, 'uFamily')
-		)
+		compare: compareMM!Match ( thisModule.addedElementLeft(compare, 'uFamily') )
 	to
 		uFamilies: UFamiliesMM!uFamily (
 			--relations
@@ -338,15 +337,16 @@ rule addedLeft2uFamily {
 			uright <- thisModule.getAddedLeftCollection(compare, 'uright'),
 			upoint <- thisModule.getAddedLeftCollection(compare, 'upoint')
 		)
+	do {
+		compare.debug('uFamily_add_L'); 
+	}
 }
 
 ------------------------------------ Added Left ------------------------------------
 ------------------------------------ Added Right ------------------------------------
 rule addedRight2member {
 	from
-		compare: compareMM!Match (
-			thisModule.addedElementRight(compare, 'Member')
-		)
+		compare: compareMM!Match ( thisModule.addedElementRight(compare, 'Member') )
 	to
 		f: UFamiliesMM!Member (
 			--attributes
@@ -355,25 +355,27 @@ rule addedRight2member {
 			--relations
 			relatives <- thisModule.getAddedRightSingle(compare, 'relatives')
 		)
+	do {
+		compare.debug('Member_add_R'); 
+	}
 }
 
 rule addedRight2familyRegistry {
 	from
-		compare: compareMM!Match (
-			thisModule.addedElementRight(compare, 'FamilyRegistry')
-		)
+		compare: compareMM!Match ( thisModule.addedElementRight(compare, 'FamilyRegistry') )
 	to
 		uFamilies: UFamiliesMM!FamilyRegistry (
 			--relations
 			families <- thisModule.getAddedRightCollection(compare, 'families')
 		)
+	do {
+		compare.debug('FamilyRegistry_add_R'); 
+	}
 }
 
 rule addedRight2family {
 	from
-		compare: compareMM!Match (
-			thisModule.addedElementRight(compare, 'Family')
-		)
+		compare: compareMM!Match ( thisModule.addedElementRight(compare, 'Family') )
 	to
 		uFamilies: UFamiliesMM!Family (
 			--attributes
@@ -386,13 +388,14 @@ rule addedRight2family {
 			daughters <- thisModule.getAddedRightCollection(compare, 'daughters'),
 			links <- thisModule.getAddedRightCollection(compare, 'links')
 		)
+	do {
+		compare.debug('Family_add_R'); 
+	}
 }
 
 rule addedRight2uMember {
 	from
-		compare: compareMM!Match (
-			thisModule.addedElementRight(compare, 'uMember')
-		)
+		compare: compareMM!Match ( thisModule.addedElementRight(compare, 'uMember') )
 	to
 		f: UFamiliesMM!uMember (
 			--relations
@@ -401,13 +404,14 @@ rule addedRight2uMember {
 			uright <- thisModule.getAddedRightCollection(compare, 'uright'),
 			upoint <- thisModule.getAddedRightCollection(compare, 'upoint')
 		)
+	do {
+		compare.debug('uMember_add_R'); 
+	}
 }
 
 rule addedRight2uFamilyRegistry {
 	from
-		compare: compareMM!Match (
-			thisModule.addedElementRight(compare, 'uFamilyRegistry')
-		)
+		compare: compareMM!Match ( thisModule.addedElementRight(compare, 'uFamilyRegistry') )
 	to
 		uFamilies: UFamiliesMM!uFamilyRegistry (
 			--relations
@@ -416,13 +420,14 @@ rule addedRight2uFamilyRegistry {
 			uright <- thisModule.getAddedRightCollection(compare, 'uright'),
 			upoint <- thisModule.getAddedRightCollection(compare, 'upoint')
 		)
+	do {
+		compare.debug('uFamilyRegistry_add_R'); 
+	}
 }
 
 rule addedRight2uFamily {
 	from
-		compare: compareMM!Match (
-			thisModule.addedElementRight(compare, 'uFamily')
-		)
+		compare: compareMM!Match ( thisModule.addedElementRight(compare, 'uFamily') )
 	to
 		uFamilies: UFamiliesMM!uFamily (
 			--relations
@@ -431,32 +436,31 @@ rule addedRight2uFamily {
 			uright <- thisModule.getAddedRightCollection(compare, 'uright'),
 			upoint <- thisModule.getAddedRightCollection(compare, 'upoint')
 		)
+	do {
+		compare.debug('uFamily_add_R'); 
+	}
 }
 
 ------------------------------------ Added Right ------------------------------------
 ------------------------------------ Changed Left ------------------------------------
 rule changeLeft2familyRegistry {
 	from
-		compare: compareMM!Match (
-			thisModule.changedAttributesLeft(compare, 'FamilyRegistry') or thisModule.
-					changedReferenceLeft(compare, 'FamilyRegistry')
-		)
+		compare: compareMM!Match ( thisModule.changedAttributesLeft(compare, 'FamilyRegistry') or 
+			thisModule.changedReferenceLeft(compare, 'FamilyRegistry') )
 	to
 		f: UFamiliesMM!FamilyRegistry (
 			--relations
 			families <- thisModule.getAddedLeftCollection(compare, 'families')
 		)
 	do {
-		compare.debug('Changed_familyRegistry'); 
+		compare.debug('FamilyRegistry_changed_L'); 
 	}
 }
 
 rule changeLeft2family {
 	from
-		compare: compareMM!Match (
-			thisModule.changedAttributesLeft(compare, 'Family') or thisModule.
-					changedReferenceLeft(compare, 'Family')
-		)
+		compare: compareMM!Match ( thisModule.changedAttributesLeft(compare, 'Family') or 
+			thisModule.changedReferenceLeft(compare, 'Family') )
 	to
 		f: UFamiliesMM!Family (
 			--attributes
@@ -477,16 +481,14 @@ rule changeLeft2family {
 					append(thisModule.getAddedRightCollection(compare, 'links'))
 		)
 	do {
-		compare.debug('Changed_family'); 
+		compare.debug('Family_changed_L'); 
 	}
 }
 
 rule changeLeft2member {
 	from
-		compare: compareMM!Match (
-			thisModule.changedAttributesLeft(compare, 'Member') or thisModule.
-					changedReferenceLeft(compare, 'Member')
-		)
+		compare: compareMM!Match ( thisModule.changedAttributesLeft(compare, 'Member') or 
+			thisModule.changedReferenceLeft(compare, 'Member') )
 	to
 		f: UFamiliesMM!Member (
 			--attributes
@@ -496,7 +498,7 @@ rule changeLeft2member {
 			relatives <- thisModule.getReference(compare, 'relatives', 'left')
 		)
 	do {
-		compare.debug('Changed_member'); 
+		compare.debug('Member_changed_L'); 
 	}
 }
 
@@ -504,17 +506,15 @@ rule changeLeft2member {
 ------------------------------------ Changed Right ------------------------------------
 rule changeRight2familyRegistry {
 	from
-		compare: compareMM!Match (
-			thisModule.changedAttributesRight(compare, 'FamilyRegistry') or thisModule.
-					changedReferenceRight(compare, 'FamilyRegistry')
-		)
+		compare: compareMM!Match ( thisModule.changedAttributesRight(compare, 'FamilyRegistry') or 
+			thisModule.changedReferenceRight(compare, 'FamilyRegistry') )
 	to
 		f: UFamiliesMM!FamilyRegistry (
 			--relations
 			families <- thisModule.getAddedRightCollection(compare, 'families')
 		)
 	do {
-		compare.debug('refChanged_familyRegistry'); 
+		compare.debug('FamilyRegistry_changed_R'); 
 	}
 }
 
@@ -544,7 +544,7 @@ rule changeRight2family {
 					append(thisModule.getAddedRightCollection(compare, 'links'))
 		)
 	do {
-		compare.debug('refChanged_family'); 
+		compare.debug('Family_changed_R'); 
 	}
 }
 
@@ -563,7 +563,7 @@ rule changeRight2member {
 			relatives <- thisModule.getReference(compare, 'relatives', 'right')
 		)
 	do {
-		compare.debug('attrChanged_member'); 
+		compare.debug('Member_changed_R'); 
 	}
 }
 
@@ -595,6 +595,9 @@ rule ConflictAMember {
 			--relations
 			relatives <- thisModule.getReference(match, 'relatives', 'right')
 		)
+	do {
+		match.debug('Member_conflict'); 
+	}
 }
 
 rule ConflictAFamily {
@@ -632,12 +635,13 @@ rule ConflictAFamily {
 			daughters <- compare.origin.daughters -> collect(e |thisModule.cloneMembers(e))
 		)
 	do {
-		compare.debug('conflict_Family'); 
+		compare.debug('Family_conflict'); 
 	}
 }
 
 lazy rule cloneMembers {
-	from compare: UFamiliesMM!Member (
+	from 
+		compare: UFamiliesMM!Member (
 			thisModule.checkUnconflictMatch(compare, 'Member') and
 			thisModule.checkContainerConflict(compare, 'Member')
 		)
@@ -647,22 +651,10 @@ lazy rule cloneMembers {
 			firstName <- compare.firstName,
 			age <- compare.age
 		)
+	do {
+		compare.debug('Member_clone'); 
+	}
 }
-
---rule ConflictMatch2member {
---	from
---		compare: compareMM!Match (thisModule.checkConflictMatch(compare, 'Family').debug('MAMMETA') )
---	to
---		f: UFamiliesMM!Member (
-			--attributes
---			firstName <- thisModule.getAttributeOrigin(compare, 'firstName'),
---			age <- thisModule.getAttributeOrigin(compare, 'age'),
---			relatives <- thisModule.getReferenceOrigin(compare, 'relatives')
---		)
---	do {
---		compare.debug('Member_match'); 
---	}
---}
 
 --rule conflictFamily2members {
 --	from
