@@ -616,91 +616,57 @@ rule ConflictAFamily {
 			--attributes
 			address <- thisModule.getAttribute(compare, 'address', 'left'),
 			lastName <- thisModule.getAttribute(compare, 'lastName', 'left'),
-				--relations
-			father <- thisModule.getUnchangedElementsByNameSingle(compare, 'father'),
-			mother <- thisModule.getUnchangedElementsByNameSingle(compare, 'mother'),
-			sons <- thisModule.getUnchangedElementsByNameCollection(compare, 'sons') ->
-					append(thisModule.getAddedLeftCollection(compare, 'sons')) ->
-					append(thisModule.getAddedRightCollection(compare, 'sons')),
-			daughters <- thisModule.getUnchangedElementsByNameCollection(compare,
-					'daughters') -> append(thisModule.getAddedLeftCollection(compare,
-					'daughters')) -> append(thisModule.getAddedRightCollection(compare,
-					'daughters')),
-			links <- thisModule.getUnchangedElementsByNameCollection(compare, 'links') ->
-					append(thisModule.getAddedLeftCollection(compare, 'links')) ->
-					append(thisModule.getAddedRightCollection(compare, 'links'))
+			
+			--relations
+			father <- thisModule.cloneMembers(compare.origin.father),
+			mother <- thisModule.cloneMembers(compare.origin.mother)
 		),
 		right: UFamiliesMM!Family (
 			--attributes
 			address <- thisModule.getAttribute(compare, 'address', 'right'),
 			lastName <- thisModule.getAttribute(compare, 'lastName', 'right'),
-				--relations
-			father <- thisModule.getUnchangedElementsByNameSingle(compare, 'father'),
-			mother <- thisModule.getUnchangedElementsByNameSingle(compare, 'mother'),
-			sons <- thisModule.getUnchangedElementsByNameCollection(compare, 'sons') ->
-					append(thisModule.getAddedLeftCollection(compare, 'sons')) ->
-					append(thisModule.getAddedRightCollection(compare, 'sons')),
-			daughters <- thisModule.getUnchangedElementsByNameCollection(compare,
-					'daughters') -> append(thisModule.getAddedLeftCollection(compare,
-					'daughters')) -> append(thisModule.getAddedRightCollection(compare,
-					'daughters')),
-			links <- thisModule.getUnchangedElementsByNameCollection(compare, 'links') ->
-					append(thisModule.getAddedLeftCollection(compare, 'links')) ->
-					append(thisModule.getAddedRightCollection(compare, 'links'))
+			
+			--relations
+			father <- thisModule.cloneMembers(compare.origin.father),
+			mother <- thisModule.cloneMembers(compare.origin.mother),
+			sons <- thisModule.cloneMembers(compare.origin.sons),
+			daughters <- thisModule.cloneMembers(compare.origin.daughters)
 		)
 	do {
 		compare.debug('conflict_Family'); 
 	}
 }
 
-lazy rule cloneFamilyLeft {
-	from
-		compare: compareMM!Match 
-		
+lazy rule cloneMembers {
+	from compare: UFamiliesMM!Member
 	to 
-		left: UFamiliesMM!Family (
+		member: UFamiliesMM!Member (
 			--attributes
-			address <- thisModule.getAttribute(compare, 'address', 'left'),
-			lastName <- thisModule.getAttribute(compare, 'lastName', 'left'),
-				--relations
-			father <- thisModule.getUnchangedElementsByNameSingle(compare, 'father'),
-			mother <- thisModule.getUnchangedElementsByNameSingle(compare, 'mother'),
-			sons <- thisModule.getUnchangedElementsByNameCollection(compare, 'sons') ->
-					append(thisModule.getAddedLeftCollection(compare, 'sons')) ->
-					append(thisModule.getAddedRightCollection(compare, 'sons')),
-			daughters <- thisModule.getUnchangedElementsByNameCollection(compare,
-					'daughters') -> append(thisModule.getAddedLeftCollection(compare,
-					'daughters')) -> append(thisModule.getAddedRightCollection(compare,
-					'daughters')),
-			links <- thisModule.getUnchangedElementsByNameCollection(compare, 'links') ->
-					append(thisModule.getAddedLeftCollection(compare, 'links')) ->
-					append(thisModule.getAddedRightCollection(compare, 'links'))
-			
-	
+			firstName <- compare.firstName,
+			age <- compare.age
 		)
 }
 
-lazy rule cloneFamilyRight {
-	from
-		compare: compareMM!Match 
-		
-	to 
-		left: UFamiliesMM!Family (
+--rule conflictFamily2members {
+--	from
+--		compare: compareMM!Match (
+--			thisModule.checkUnconflictMatch(compare, 'Member') and
+--			thisModule.checkContainerConflict(compare, 'Member')
+--		)
+--	to
+--		t1: UFamiliesMM!Member (
 			--attributes
-			address <- thisModule.getAttribute(compare, 'address', 'right'),
-			lastName <- thisModule.getAttribute(compare, 'lastName', 'right'),
-				--relations
-			father <- thisModule.getUnchangedElementsByNameSingle(compare, 'father'),
-			mother <- thisModule.getUnchangedElementsByNameSingle(compare, 'mother'),
-			sons <- thisModule.getUnchangedElementsByNameCollection(compare, 'sons') ->
-					append(thisModule.getAddedLeftCollection(compare, 'sons')) ->
-					append(thisModule.getAddedRightCollection(compare, 'sons')),
-			daughters <- thisModule.getUnchangedElementsByNameCollection(compare,
-					'daughters') -> append(thisModule.getAddedLeftCollection(compare,
-					'daughters')) -> append(thisModule.getAddedRightCollection(compare,
-					'daughters')),
-			links <- thisModule.getUnchangedElementsByNameCollection(compare, 'links') ->
-					append(thisModule.getAddedLeftCollection(compare, 'links')) ->
-					append(thisModule.getAddedRightCollection(compare, 'links'))
-		)
-}
+--			firstName <- thisModule.getAttributeOrigin(compare, 'firstName'),
+--			age <- thisModule.getAttributeOrigin(compare, 'age'),
+--			relatives <- thisModule.getReferenceOrigin(compare, 'relatives')
+--		),
+--		t2: UFamiliesMM!Member (
+			--attributes
+--			firstName <- thisModule.getAttributeOrigin(compare, 'firstName'),
+--			age <- thisModule.getAttributeOrigin(compare, 'age'),
+--			relatives <- thisModule.getReferenceOrigin(compare, 'relatives')
+--		)
+--	do {
+--		compare.debug('conflictFamily2members'); 
+--	}
+--}
