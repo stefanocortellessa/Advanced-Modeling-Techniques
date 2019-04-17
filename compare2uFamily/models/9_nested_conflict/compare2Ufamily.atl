@@ -12,8 +12,10 @@ helper def: checkUnconflictMatch(cf: compareMM!Match, name: String): Boolean =
 			isEmpty();
 
 helper def: checkContainerConflict(cf: compareMM!Match, name: String): Boolean =
-	not cf.origin.oclIsUndefined() and not cf.left.oclIsUndefined() and not cf.right.
-			oclIsUndefined() and (name = cf.origin.oclType().name) and cf.differences->size() = 0;
+	if (name = cf.origin.oclType().name)
+		then not cf.refImmediateComposite().differences->collect(e | e.conflict)->select(i | not i.oclIsUndefined())->isEmpty()
+		else false
+		endif;
 
 helper def: checkConflictMatch(cf: compareMM!Match, name: String): Boolean =
 	not cf.origin.oclIsUndefined() and not cf.left.oclIsUndefined() and not cf.right.
@@ -123,8 +125,8 @@ helper def: changedReferenceRight(cf: compareMM!Match, name: String): Boolean =
 ------------------------------------ Matches ------------------------------------
 rule match2member {
 	from
-		compare: compareMM!Match ( thisModule.checkUnconflictMatch(compare, 'Member') and 
-							   (not thisModule.checkContainerConflict(compare, 'Member')) )
+		compare: compareMM!Match ( thisModule.checkUnconflictMatch(compare, 'Member') and
+									not thisModule.checkContainerConflict(compare, 'Member') )
 	to
 		f: UFamiliesMM!Member (
 			--attributes
@@ -652,34 +654,10 @@ lazy rule cloneMembers {
 	to 
 		member: UFamiliesMM!Member (
 			--attributes
-			firstName <- compare.firstName.debug('firstName'),
+			firstName <- compare.firstName,
 			age <- compare.age
 		)
 	do {
 		compare.debug('Member_clone'); 
 	}
 }
-
---rule conflictFamily2members {
---	from
---		compare: compareMM!Match (
---			thisModule.checkUnconflictMatch(compare, 'Member') and
---			thisModule.checkContainerConflict(compare, 'Member')
---		)
---	to
---		t1: UFamiliesMM!Member (
-			--attributes
---			firstName <- thisModule.getAttributeOrigin(compare, 'firstName'),
---			age <- thisModule.getAttributeOrigin(compare, 'age'),
---			relatives <- thisModule.getReferenceOrigin(compare, 'relatives')
---		),
---		t2: UFamiliesMM!Member (
-			--attributes
---			firstName <- thisModule.getAttributeOrigin(compare, 'firstName'),
---			age <- thisModule.getAttributeOrigin(compare, 'age'),
---			relatives <- thisModule.getReferenceOrigin(compare, 'relatives')
---		)
---	do {
---		compare.debug('conflictFamily2members'); 
---	}
---}
