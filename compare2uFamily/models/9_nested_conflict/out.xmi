@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<Families:FamilyRegistry xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Families="http://it.univaq.disim/uncertainty.ufamily" xmlns:uncertainty="uncertainty">
-  <families xsi:type="Families:Family" lastName="Di Francesco">
-    <sons xsi:type="Families:Member" firstName="Stefano" age="25"/>
-  </families>
-  <families xsi:type="uncertainty:uFamily" utype="OR">
-    <uleft lastName="Cortellessa" address="Via Roma 2"/>
-    <uright lastName="Cortellessa" address="Via Roma 3">
-      <sons xsi:type="Families:Member" firstName="Giovanni" age="29"/>
-      <sons xsi:type="Families:Member" firstName="Stefano" age="24">
-        <relatives xsi:type="Families:Member" href="FamilyRegistry_1_O.xmi#//@families.0/@father"/>
-      </sons>
-      <mother xsi:type="Families:Member" firstName="Paola" age="53"/>
-      <father xsi:type="Families:Member" firstName="Maurizio" age="56"/>
-    </uright>
-  </families>
-</Families:FamilyRegistry>
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Families="http://it.univaq.disim/uncertainty.ufamily">
+  <Families:Member firstName="Giovanni" age="29"/>
+  <Families:Member firstName="Stefano" age="25">
+    <relatives xsi:type="Families:Member" href="FamilyRegistry_1_O.xmi#//@families.0/@father"/>
+  </Families:Member>
+  <Families:Member firstName="Paola" age="53"/>
+  <Families:Member firstName="Maurizio" age="56"/>
+  <Families:FamilyRegistry>
+    <families xsi:type="Families:Family" lastName="Di Francesco">
+      <sons xsi:type="Families:Member" firstName="Stefano" age="25"/>
+    </families>
+  </Families:FamilyRegistry>
+</xmi:XMI>

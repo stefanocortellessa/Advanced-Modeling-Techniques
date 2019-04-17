@@ -619,7 +619,9 @@ rule ConflictAFamily {
 			
 			--relations
 			father <- thisModule.cloneMembers(compare.origin.father),
-			mother <- thisModule.cloneMembers(compare.origin.mother)
+			mother <- thisModule.cloneMembers(compare.origin.mother),
+			sons <- compare.origin.sons -> collect(e |thisModule.cloneMembers(e)),
+			daughters <- compare.origin.daughters -> collect(e |thisModule.cloneMembers(e))
 		),
 		right: UFamiliesMM!Family (
 			--attributes
@@ -629,8 +631,8 @@ rule ConflictAFamily {
 			--relations
 			father <- thisModule.cloneMembers(compare.origin.father),
 			mother <- thisModule.cloneMembers(compare.origin.mother),
-			sons <- thisModule.cloneMembers(compare.origin.sons),
-			daughters <- thisModule.cloneMembers(compare.origin.daughters)
+			sons <- compare.origin.sons -> collect(e |thisModule.cloneMembers(e)),
+			daughters <- compare.origin.daughters -> collect(e |thisModule.cloneMembers(e))
 		)
 	do {
 		compare.debug('conflict_Family'); 
@@ -638,7 +640,10 @@ rule ConflictAFamily {
 }
 
 lazy rule cloneMembers {
-	from compare: UFamiliesMM!Member
+	from compare: UFamiliesMM!Member (
+			thisModule.checkUnconflictMatch(compare, 'Member') and
+			thisModule.checkContainerConflict(compare, 'Member')
+		)
 	to 
 		member: UFamiliesMM!Member (
 			--attributes
