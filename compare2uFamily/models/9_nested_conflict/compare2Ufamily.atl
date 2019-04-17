@@ -1,16 +1,19 @@
 -- @path compareMM=/compare2Ufamily/metamodels/compare.ecore
 -- @path UFamiliesMM=/compare2Ufamily/metamodels/UFamily.ecore
 
-
 module compare2Ufamily;
 create OUT: UFamiliesMM from IN: compareMM;
 
--- ###################################################### HELPERS
-		-- ###################################################### --
+-- ###################################################### HELPERS ###################################################### --
 
 helper def: checkUnconflictMatch(cf: compareMM!Match, name: String): Boolean =
 	not cf.origin.oclIsUndefined() and not cf.left.oclIsUndefined() and not cf.right.
 			oclIsUndefined() and (name = cf.origin.oclType().name) and cf.differences ->
+			isEmpty();
+
+helper def: checkConflictMatch(cf: compareMM!Match, name: String): Boolean =
+	not cf.origin.oclIsUndefined() and not cf.left.oclIsUndefined() and not cf.right.
+			oclIsUndefined() and (name = cf.origin.oclType().name) and not cf.differences ->
 			isEmpty();
 
 helper def: changedAttributesLeft(cf: compareMM!Match, name: String): Boolean =
@@ -108,12 +111,11 @@ helper def: changedReferenceRight(cf: compareMM!Match, name: String): Boolean =
 			compareMM!ReferenceChange.toString().endsWith(e.oclType().name)) ->
 			isEmpty()) and (cf.differences -> select(e | not e.conflict.oclIsUndefined())
 			-> isEmpty()) and (name = cf.left.oclType().name);
-
 ------------------------------------ References ------------------------------------
--- ###################################################### HELPERS
-		-- ###################################################### --
--- ####################################################### RULES
-		-- ####################################################### --
+
+-- ###################################################### HELPERS ###################################################### --
+-- ####################################################### RULES ####################################################### --
+
 ------------------------------------ Matches ------------------------------------
 rule match2member {
 	from
@@ -134,9 +136,7 @@ rule match2member {
 
 rule match2familyRegistry {
 	from
-		compare: compareMM!Match (
-			thisModule.checkUnconflictMatch(compare, 'FamilyRegistry')
-		)
+		compare: compareMM!Match (thisModule.checkUnconflictMatch(compare, 'FamilyRegistry') )
 	to
 		uFamilies: UFamiliesMM!FamilyRegistry (
 			--relations
@@ -179,10 +179,8 @@ rule match2family {
 	}
 }
 
------------------------------------------ Matches
---- -----------------------------------------
------------------------------------- Matches 4
---- uMembers------------------------------------
+------------------------------------------ Matches --------------------------------------------
+------------------------------------ Matches 4 -- uMembers------------------------------------
 rule match2uMember {
 	from
 		compare: compareMM!Match (
@@ -246,9 +244,8 @@ rule match2uFamily {
 		)
 }
 
------------------------------------- Matches 4
---- uMembers------------------------------------
------------------------------------- Added Left ------------------------------------
+------------------------------------ Matches 4 -- uMembers------------------------------------
+------------------------------------------ Added Left ----------------------------------------
 rule addedLeft2member {
 	from
 		compare: compareMM!Match (
@@ -651,6 +648,21 @@ lazy rule cloneMembers {
 			age <- compare.age
 		)
 }
+
+--rule ConflictMatch2member {
+--	from
+--		compare: compareMM!Match (thisModule.checkConflictMatch(compare, 'Family').debug('MAMMETA') )
+--	to
+--		f: UFamiliesMM!Member (
+			--attributes
+--			firstName <- thisModule.getAttributeOrigin(compare, 'firstName'),
+--			age <- thisModule.getAttributeOrigin(compare, 'age'),
+--			relatives <- thisModule.getReferenceOrigin(compare, 'relatives')
+--		)
+--	do {
+--		compare.debug('Member_match'); 
+--	}
+--}
 
 --rule conflictFamily2members {
 --	from
