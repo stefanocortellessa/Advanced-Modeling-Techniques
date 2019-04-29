@@ -3,8 +3,7 @@
     xmi:version="2.0"
     xmlns:xmi="http://www.omg.org/XMI"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:Families="http://it.univaq.disim/uncertainty.ufamily"
-    xmlns:uncertainty="uncertainty">
+    xmlns:Families="http://it.univaq.disim/uncertainty.ufamily">
   <families
       xsi:type="Families:Family"
       lastName="Cortellessa"
@@ -15,11 +14,6 @@
     <sons xsi:type="Families:Member"
         firstName="Stefano"
         age="24"/>
-    <sons xsi:type="uncertainty:uMember"
-        name="Luca"/>
-    <daughters
-        xsi:type="uncertainty:uMember"
-        name="Lucia"/>
     <mother
         xsi:type="Families:Member"
         firstName="Paola"
