@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="ASCII"?>
+<compare:Comparison xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:compare="http://www.eclipse.org/emf/compare" threeWay="true">
+  <matchedResources leftURI="platform:/resource/compare2uFamily/models/11_add_change/FamilyRegistry_1_L.xmi"/>
+  <matchedResources rightURI="platform:/resource/compare2uFamily/models/11_add_change/FamilyRegistry_1_R.xmi"/>
+  <matchedResources originURI="platform:/resource/compare2uFamily/models/11_add_change/FamilyRegistry_1_O.xmi"/>
+  <matches>
+    <submatches>
+      <submatches>
+        <left href="platform:/resource/compare2uFamily/models/11_add_change/FamilyRegistry_1_L.xmi#//@families.1/@sons.0"/>
+      </submatches>
+      <submatches>
+        <right href="platform:/resource/compare2uFamily/models/11_add_change/FamilyRegistry_1_R.xmi#//@families.1/@daughters.0"/>
+      </submatches>
+      <differences xsi:type="compare:ReferenceChange">
+        <reference href="http://it.univaq.disim/uncertainty.ufamily#//Family/sons"/>
+        <value href="platform:/resource/compare2uFamily/models/11_add_change/FamilyRegistry_1_L.xmi#//@families.1/@sons.0"/>
+      </differences>
+      <differences xsi:type="compare:ReferenceChange" source="RIGHT">
+        <reference href="http://it.univaq.disim/uncertainty.ufamily#//Family/daughters"/>
+        <value href="platform:/resource/compare2uFamily/models/11_add_change/FamilyRegistry_1_R.xmi#//@families.1/@daughters.0"/>
+      </differences>
+      <left href="platform:/resource/compare2uFamily/models/11_add_change/FamilyRegistry_1_L.xmi#//@families.1"/>
+      <right href="platform:/resource/compare2uFamily/models/11_add_change/FamilyRegistry_1_R.xmi#//@families.1"/>
+      <origin href="platform:/resource/compare2uFamily/models/11_add_change/FamilyRegistry_1_O.xmi#//@families.1"/>
+    </submatches>
+    <submatches>
+      <submatches>
+        <differences xsi:type="compare:AttributeChange" kind="CHANGE">
+          <attribute href="http://it.univaq.disim/uncertainty.ufamily#//Member/firstName"/>
+        </differences>
+        <left href="platform:/resource/compare2uFamily/models/11_add_change/FamilyRegistry_1_L.xmi#//@families.0/@sons.0"/>
+        <right href="platform:/resource/compare2uFamily/models/11_add_change/FamilyRegistry_1_R.xmi#//@families.0/@sons.0"/>
+        <origin href="platform:/resource/compare2uFamily/models/11_add_change/FamilyRegistry_1_O.xmi#//@families.0/@sons.0"/>
+      </submatches>
+      <left href="platform:/resource/compare2uFamily/models/11_add_change/FamilyRegistry_1_L.xmi#//@families.0"/>
+      <right href="platform:/resource/compare2uFamily/models/11_add_change/FamilyRegistry_1_R.xmi#//@families.0"/>
+      <origin href="platform:/resource/compare2uFamily/models/11_add_change/FamilyRegistry_1_O.xmi#//@families.0"/>
+    </submatches>
+    <left href="platform:/resource/compare2uFamily/models/11_add_change/FamilyRegistry_1_L.xmi#/"/>
+    <right href="platform:/resource/compare2uFamily/models/11_add_change/FamilyRegistry_1_R.xmi#/"/>
+    <origin href="platform:/resource/compare2uFamily/models/11_add_change/FamilyRegistry_1_O.xmi#/"/>
+  </matches>
+</compare:Comparison>

@@ -451,7 +451,7 @@ rule addedRight2uFamily {
 }
 
 ------------------------------------ Added Right ------------------------------------
-rule changeLeft_OR_Right2family {
+rule changeLeftandRight2family {
 	from compare: compareMM!Match (
 		(thisModule.changedAttributesLeft(compare, 'Family') and thisModule.changedAttributesRight(compare, 'Family'))
 		or

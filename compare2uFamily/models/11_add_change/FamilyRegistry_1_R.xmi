@@ -6,16 +6,16 @@
     xmlns:Families="http://it.univaq.disim/uncertainty.ufamily">
   <families
       xsi:type="Families:Family"
-      lastName="Di Francesco"
-      links="//@families.1">
+      lastName="Di Francesco">
     <sons xsi:type="Families:Member"
         firstName="Stefano"
         age="25"/>
   </families>
   <families
       xsi:type="Families:Family"
-      lastName="Andrea_Left">
-    <sons xsi:type="Families:Member"
-        firstName="Stefano"/>
+      lastName="Andrea">
+    <daughters
+        xsi:type="Families:Member"
+        firstName="Jane"/>
   </families>
 </Families:FamilyRegistry>

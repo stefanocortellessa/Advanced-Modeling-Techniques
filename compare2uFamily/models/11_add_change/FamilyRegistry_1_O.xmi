@@ -6,8 +6,7 @@
     xmlns:Families="http://it.univaq.disim/uncertainty.ufamily">
   <families
       xsi:type="Families:Family"
-      lastName="Di Francesco"
-      links="//@families.1">
+      lastName="Di Francesco">
     <sons xsi:type="Families:Member"
         firstName="Stefano"
         age="25"/>
