@@ -13,8 +13,7 @@
         age="29"/>
     <sons xsi:type="Families:Member"
         firstName="Stefano"
-        age="25"
-        relatives="//@families.0/@mother"/>
+        age="26"/>
     <mother
         xsi:type="Families:Member"
         firstName="Paola"

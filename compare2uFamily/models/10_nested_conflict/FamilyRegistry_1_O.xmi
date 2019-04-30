@@ -13,8 +13,7 @@
         age="29"/>
     <sons xsi:type="Families:Member"
         firstName="Stefano"
-        age="26"
-        relatives="//@families.0/@sons.0"/>
+        age="24"/>
     <mother
         xsi:type="Families:Member"
         firstName="Paola"
@@ -23,5 +22,12 @@
         xsi:type="Families:Member"
         firstName="Maurizio"
         age="56"/>
+  </families>
+  <families
+      xsi:type="Families:Family"
+      lastName="Di Francesco">
+    <sons xsi:type="Families:Member"
+        firstName="Stefano"
+        age="25"/>
   </families>
 </Families:FamilyRegistry>

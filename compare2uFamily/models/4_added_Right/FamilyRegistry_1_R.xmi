@@ -17,9 +17,6 @@
         age="24"/>
     <sons xsi:type="uncertainty:uMember"
         name="Luca"/>
-    <daughters
-        xsi:type="uncertainty:uMember"
-        name="Lucia"/>
     <mother
         xsi:type="Families:Member"
         firstName="Paola"
@@ -29,4 +26,7 @@
         firstName="Maurizio"
         age="56"/>
   </families>
+  <families
+      xsi:type="uncertainty:uFamily"
+      name="Di Francesco"/>
 </Families:FamilyRegistry>

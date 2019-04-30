@@ -7,7 +7,8 @@
   <families
       xsi:type="Families:Family"
       lastName="Cortellessa"
-      address="Via Roma">
+      address="Via Roma"
+      links="//@families.1">
     <sons xsi:type="Families:Member"
         firstName="Giovanni"
         age="29"/>
