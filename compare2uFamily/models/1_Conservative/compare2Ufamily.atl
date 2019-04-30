@@ -8,7 +8,8 @@ create OUT: UFamiliesMM from IN: compareMM;
 
 helper def: checkUnconflictMatch(cf: compareMM!Match, name: String): Boolean =
 	not cf.origin.oclIsUndefined() and not cf.left.oclIsUndefined() and not cf.right.
-			oclIsUndefined() and (name = cf.origin.oclType().name);
+			oclIsUndefined() and (name = cf.origin.oclType().name) and
+			cf.differences->isEmpty();
 
 helper def: checkContainerConflict(cf: compareMM!Match, name: String): Boolean =
 	if (name = cf.origin.oclType().name)
@@ -106,13 +107,13 @@ helper def: getReference(Match: compareMM!Match, Reference: String, direction: S
 	Match.refGetValue(direction).refGetValue(Reference);
 
 helper def: changedReferenceLeft(cf: compareMM!Match, name: String): Boolean =
-	(not cf.differences -> select(e | e.source = #LEFT and e.kind = #CHANGE) -> select(e |
+	(not cf.differences -> select(e | e.source = #LEFT) -> select(e |
 			compareMM!ReferenceChange.toString().endsWith(e.oclType().name)) ->
 			isEmpty()) and (cf.differences -> select(e | not e.conflict.oclIsUndefined())
 			-> isEmpty()) and (name = cf.left.oclType().name);
 
 helper def: changedReferenceRight(cf: compareMM!Match, name: String): Boolean =
-	(not cf.differences -> select(e | e.source = #RIGHT and e.kind = #CHANGE) -> select(e |
+	(not cf.differences -> select(e | e.source = #RIGHT) -> select(e |
 			compareMM!ReferenceChange.toString().endsWith(e.oclType().name)) ->
 			isEmpty()) and (cf.differences -> select(e | not e.conflict.oclIsUndefined())
 			-> isEmpty()) and (name = cf.left.oclType().name);
@@ -125,7 +126,7 @@ helper def: changedReferenceRight(cf: compareMM!Match, name: String): Boolean =
 rule match2member {
 	from
 		compare: compareMM!Match ( thisModule.checkUnconflictMatch(compare, 'Member') and
-									not thisModule.checkContainerConflict(compare, 'Member') )
+									not thisModule.checkContainerConflict(compare, 'Member'))
 	to
 		f: UFamiliesMM!Member (
 			--attributes
@@ -156,12 +157,12 @@ rule match2familyRegistry {
 
 rule match2family {
 	from
-		compare: compareMM!Match ( thisModule.checkUnconflictMatch(compare, 'Family') )
+		compare: compareMM!Match ( thisModule.checkUnconflictMatch(compare, 'Family'))
 	to
-		uFamilies: UFamiliesMM!Family (
+		f: UFamiliesMM!Family (
 			--attributes
-			lastName <- thisModule.getAttributeOrigin(compare, 'lastName'),
-			address <- thisModule.getAttributeOrigin(compare, 'address'),
+			address <- thisModule.getAttribute(compare, 'address', 'left'),
+			lastName <- thisModule.getAttribute(compare, 'lastName', 'left'),
 			--relations
 			father <- thisModule.getUnchangedElementsByNameSingle(compare, 'father'),
 			mother <- thisModule.getUnchangedElementsByNameSingle(compare, 'mother'),
