@@ -136,14 +136,13 @@ helper def: changedReferenceRight(cf: compareMM!Match, name: String): Boolean =
 
 [for (metaclass : EClass | model.eContents(EClass))separator('\n\n')]
 [if (metaclass.eInverse()->isEmpty() and not metaclass.eAllSuperTypes->exists(e | not e.eInverse(EReference)->isEmpty()))]
-
 rule match2[metaclass.name/] {
 	from
 		compare: compareMM!Match (thisModule.checkConservative(compare, '[metaclass.name/]') )
 	to
 		u[model.name/]: U[model.name/]MM![metaclass.name/] (
 			--relations
-			[for (ref : EReference | metaclass.eAllReferences)separator(',\n')]
+			[for (ref : EReference | metaclass.eAllReferences)separator(',')]
 			[ref.name/] <- thisModule.getUnchangedElementsByNameCollection(compare,
 					'[ref.name/]') -> append(thisModule.getAddedLeftCollection(compare,
 					'[ref.name/]')) -> append(thisModule.getAddedRightCollection(compare,
@@ -154,65 +153,69 @@ rule match2[metaclass.name/] {
 		compare.debug('[metaclass.name/]_match'); 
 	}
 }
-
 [else]
 [if (metaclass.eInverse(EReference)->exists(e | e.upperBound = 1) or metaclass.eAllSuperTypes->exists(e | e.eInverse(EReference)->exists(e | e.upperBound = 1)))]
-rule match2member {
+rule match2[metaclass.name/] {
 	from
-		compare: compareMM!Match ( thisModule.checkConservative(compare, 'Member') and
-									not thisModule.checkContainerConflict(compare, 'Member'))
+		compare: compareMM!Match ( thisModule.checkConservative(compare, '[metaclass.name/]') and
+									not thisModule.checkContainerConflict(compare, '[metaclass.name/]'))
 	to
-		f: UFamiliesMM!Member (
+		f: U[model.name/]MM![metaclass.name/] (
 			--attributes
-			firstName <- thisModule.getAttributeOrigin(compare, 'firstName').debug('firstName'),
-			age <- thisModule.getAttributeOrigin(compare, 'age'),
-			relatives <- thisModule.getReferenceOrigin(compare, 'relatives')
+			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
+			[attr.name/] <- thisModule.getAttributeOrigin(compare, '[attr.name/]')
+			[/for]
+
+			--relations
+			[for (ref : EReference | metaclass.eAllReferences)separator(',')]
+			[ref.name/] <- thisModule.getReferenceOrigin(compare, '[ref.name/]')
+			[/for]
 		)
 	do {
-		compare.debug('Member_match'); 
+		compare.debug('[metaclass.name/]_match'); 
 	}
 }
 [else]
-rule match2family {
+rule match2[metaclass.name/] {
 	from
 		compare: compareMM!Match ( thisModule.checkConservative(compare, 'Family'))
 	to
-		f: UFamiliesMM!Family (
+		f: U[modelName/]MM!Family (
 			--attributes
-			address <- thisModule.getAttribute(compare, 'address', 'left'),
-			lastName <- thisModule.getAttribute(compare, 'lastName', 'left'),
+			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
+			[attr.name/] <- thisModule.getAttribute(compare, '[attr.name/]', 'left')
+			[/for]
+
 			--relations
-			father <- thisModule.getUnchangedElementsByNameSingle(compare, 'father'),
-			mother <- thisModule.getUnchangedElementsByNameSingle(compare, 'mother'),
-			sons <- thisModule.getUnchangedElementsByNameCollection(compare, 'sons') ->
-					append(thisModule.getAddedLeftCollection(compare, 'sons')) ->
-					append(thisModule.getAddedRightCollection(compare, 'sons')),
-			daughters <- thisModule.getUnchangedElementsByNameCollection(compare,
-					'daughters') -> append(thisModule.getAddedLeftCollection(compare,
-					'daughters')) -> append(thisModule.getAddedRightCollection(compare,
-					'daughters')),
-			links <- thisModule.getReferenceOrigin(compare, 'links') ->
-					append(thisModule.getAddedLeftCollection(compare, 'links')) ->
-					append(thisModule.getAddedRightCollection(compare, 'links'))
+			[for (ref : EReference | metaclass.eAllReferences)separator(',')]
+			[if (ref.upperBound = 1)]
+			[ref.name/] <- thisModule.getUnchangedElementsByNameSingle(compare, '[ref.name/]')
+			[else]
+			[ref.name/] <- thisModule.getUnchangedElementsByNameCollection(compare, '[ref.name/]') ->
+					append(thisModule.getAddedLeftCollection(compare, '[ref.name/]')) ->
+					append(thisModule.getAddedRightCollection(compare, '[ref.name/]'))
+			[/if]
+			[/for]
 		)
 	do {
-		compare.debug('Family_match'); 
+		compare.debug('[metaclass.name/]_match'); 
 	}
 }
 [/if]
 [/if]
 [/for]
 
+
 [for (metaclass : EClass | model.eContents(EClass))separator('\n\n')]
 rule match2u[metaclass.name/] {
 	from
 		compare: compareMM!Match ( thisModule.checkConservative(compare, 'u[metaclass.name/]') )
 	to
-		f: UFamiliesMM!u[metaclass.name/] (
+		f: U[modelName/]MM!u[metaclass.name/] (
 
 			--attribute
-			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',\n')]
-			[attr.name/] <- thisModule.getAttributeOrigin(compare, '[attr.name/]'),
+			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
+			[attr.name/] <- thisModule.getAttributeOrigin(compare, '[attr.name/]')
 			[/for]
 
 			--relations
@@ -233,5 +236,501 @@ rule match2u[metaclass.name/] {
 }
 [/for]
 
+------------------------------------ Matches 4 -- uMembers------------------------------------
+------------------------------------------ Added Left ----------------------------------------
+
+[for (metaclass : EClass | model.eContents(EClass))separator('\n\n')]
+[if (metaclass.eInverse()->isEmpty() and not metaclass.eAllSuperTypes->exists(e | not e.eInverse(EReference)->isEmpty()))]
+rule addedLeft2[metaclass.name/] {
+	from
+		compare: compareMM!Match ( thisModule.addedElementLeft(compare, '[metaclass.name/]') )
+	to
+		f: U[modelName/]MM![metaclass.name/] (
+			--relations
+			[for (ref : EReference | metaclass.eAllReferences)separator(',')]
+			[ref.name/] <- thisModule.getAddedLeftCollection(compare, '[ref.name/]')
+			[/for]
+		)
+	do {
+		compare.debug('[metaclass.name/]_add_L'); 
+	}
+}
+[else]
+[if (metaclass.eInverse(EReference)->exists(e | e.upperBound = 1) or metaclass.eAllSuperTypes->exists(e | e.eInverse(EReference)->exists(e | e.upperBound = 1)))]
+rule addedLeft2[metaclass.name/] {
+	from
+		compare: compareMM!Match ( thisModule.addedElementLeft(compare, '[metaclass.name/]') )
+	to
+		f: UFamiliesMM![metaclass.name/] (
+			--attributes
+			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
+			[attr.name/] <- thisModule.getAttribute(compare, '[attr.name/]', 'left')
+			[/for]
+			--relations
+			[for (ref : EReference | metaclass.eAllReferences)separator(',')]
+			[ref.name/] <- thisModule.getAddedLeftSingle(compare, '[ref.name/]')
+			[/for]
+		)
+	do {
+		compare.debug('[metaclass.name/]_add_L'); 
+	}
+}
+[else]
+rule addedLeft2[metaclass.name/] {
+	from
+		compare: compareMM!Match ( thisModule.addedElementLeft(compare, '[metaclass.name/]') )
+	to
+		f: U[modelName/]MM![metaclass.name/] (
+			--attributes
+			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
+			[attr.name/] <- thisModule.getAttribute(compare, 'lastName', 'left')
+			[/for]
+			--relations
+			[for (ref : EReference | metaclass.eAllReferences)separator(',')]
+			[if (ref.upperBound = 1)]
+			[ref.name/] <- thisModule.getAddedLeftSingle(compare, '[ref.name/]')
+			[else]
+			[ref.name/] <- thisModule.getAddedLeftCollection(compare, '[ref.name/]')
+			[/if]
+			[/for]
+		)
+	do {
+		compare.debug('[metaclass.name/]_add_L'); 
+	}
+}
+[/if]
+[/if]
+[/for]
+
+
+[for (metaclass : EClass | model.eContents(EClass))separator('\n\n')]
+rule addedLeft2u[metaclass.name/] {
+	from
+		compare: compareMM!Match ( thisModule.addedElementLeft(compare, 'u[metaclass.name/]') )
+	to
+		f: U[modelName/]MM!u[metaclass.name/] (
+			--attribute
+			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
+			[attr.name/] <- thisModule.getAttribute(compare, '[attr.name/]', 'left'),
+			[/for]
+			--relations			
+			uleft <- thisModule.getAddedLeftCollection(compare, 'uleft'),
+			uright <- thisModule.getAddedLeftCollection(compare, 'uright'),
+			upoint <- thisModule.getAddedLeftCollection(compare, 'upoint')
+		)
+	do {
+		compare.debug('u[metaclass.name/]_add_L'); 
+	}
+}
+[/for]
+
+------------------------------------ Added Left ------------------------------------
+------------------------------------ Added Right ------------------------------------
+
+[for (metaclass : EClass | model.eContents(EClass))separator('\n\n')]
+[if (metaclass.eInverse()->isEmpty() and not metaclass.eAllSuperTypes->exists(e | not e.eInverse(EReference)->isEmpty()))]
+rule addedRight2[metaclass.name/] {
+	from
+		compare: compareMM!Match ( thisModule.addedElementRight(compare, '[metaclass.name/]') )
+	to
+		f: U[modelName/]MM![metaclass.name/] (
+			--relations
+			[for (ref : EReference | metaclass.eAllReferences)separator(',')]
+			[ref.name/] <- thisModule.getAddedRightCollection(compare, '[ref.name/]')
+			[/for]
+		)
+	do {
+		compare.debug('[metaclass.name/]_add_R'); 
+	}
+}
+[else]
+[if (metaclass.eInverse(EReference)->exists(e | e.upperBound = 1) or metaclass.eAllSuperTypes->exists(e | e.eInverse(EReference)->exists(e | e.upperBound = 1)))]
+rule addedRight2[metaclass.name/] {
+	from
+		compare: compareMM!Match ( thisModule.addedElementRight(compare, '[metaclass.name/]') )
+	to
+		f: UFamiliesMM![metaclass.name/] (
+			--attributes
+			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
+			[attr.name/] <- thisModule.getAttribute(compare, '[attr.name/]', 'right')
+			[/for]
+			--relations
+			[for (ref : EReference | metaclass.eAllReferences)separator(',')]
+			[ref.name/] <- thisModule.getAddedRightSingle(compare, '[ref.name/]')
+			[/for]
+		)
+	do {
+		compare.debug('[metaclass.name/]_add_R'); 
+	}
+}
+[else]
+rule addedRight2[metaclass.name/] {
+	from
+		compare: compareMM!Match ( thisModule.addedElementRight(compare, '[metaclass.name/]') )
+	to
+		f: U[modelName/]MM![metaclass.name/] (
+			--attributes
+			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
+			[attr.name/] <- thisModule.getAttribute(compare, 'lastName', 'right')
+			[/for]
+			--relations
+			[for (ref : EReference | metaclass.eAllReferences)separator(',')]
+			[if (ref.upperBound = 1)]
+			[ref.name/] <- thisModule.getAddedRightSingle(compare, '[ref.name/]')
+			[else]
+			[ref.name/] <- thisModule.getAddedRightCollection(compare, '[ref.name/]')
+			[/if]
+			[/for]
+		)
+	do {
+		compare.debug('[metaclass.name/]_add_R'); 
+	}
+}
+[/if]
+[/if]
+[/for]
+
+
+[for (metaclass : EClass | model.eContents(EClass))separator('\n\n')]
+rule addedRight2u[metaclass.name/] {
+	from
+		compare: compareMM!Match ( thisModule.addedElementRight(compare, 'u[metaclass.name/]') )
+	to
+		f: U[modelName/]MM!u[metaclass.name/] (
+			--attribute
+			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
+			[attr.name/] <- thisModule.getAttribute(compare, '[attr.name/]', 'right'),
+			[/for]
+			--relations			
+			uleft <- thisModule.getAddedRightCollection(compare, 'uleft'),
+			uright <- thisModule.getAddedRightCollection(compare, 'uright'),
+			upoint <- thisModule.getAddedRightCollection(compare, 'upoint')
+		)
+	do {
+		compare.debug('u[metaclass.name/]_add_R'); 
+	}
+}
+[/for]
+
+------------------------------------ Added Right ------------------------------------
+
+[for (metaclass : EClass | model.eContents(EClass))separator('\n\n')]
+[if (metaclass.eInverse()->isEmpty() and not metaclass.eAllSuperTypes->exists(e | not e.eInverse(EReference)->isEmpty()))]
+[comment FamilyRegistry/]
+[else]
+[if (metaclass.eInverse(EReference)->exists(e | e.upperBound = 1) or metaclass.eAllSuperTypes->exists(e | e.eInverse(EReference)->exists(e | e.upperBound = 1)))]
+[comment Member/]
+[else]
+rule changeLeftandRight2[metaclass.name/] {
+	from compare: compareMM!Match (
+		(thisModule.changedAttributesLeft(compare, '[metaclass.name/]') and thisModule.changedAttributesRight(compare, '[metaclass.name/]'))
+		or
+		(thisModule.changedReferenceLeft(compare, '[metaclass.name/]') and thisModule.changedReferenceRight(compare, '[metaclass.name/]'))
+		)
+	to
+		f: U[modelName/]MM![metaclass.name/] (
+			--attribute
+			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
+			[attr.name/] <- thisModule.getAttribute(compare, '[attr.name/]', 'origin')
+			[/for]
+			--relations
+			[for (ref : EReference | metaclass.eAllReferences)separator(',')]
+			[if (ref.upperBound = 1) ]
+			[ref.name/] <- thisModule.getUnchangedElementsByNameSingle(compare, '[ref.name/]')
+			[else]
+			[ref.name/] <- thisModule.getUnchangedElementsByNameCollection(compare, '[ref.name/]') ->
+					append(thisModule.getAddedLeftCollection(compare, '[ref.name/]')) ->
+					append(thisModule.getAddedRightCollection(compare, '[ref.name/]'))
+			[/if]
+			[/for]
+		)
+	do {
+		compare.debug('changes2[metaclass.name/]'); 
+	}
+}
+[/if]
+[/if]
+[/for]
+
+------------------------------------ Changed Left ------------------------------------
+
+[for (metaclass : EClass | model.eContents(EClass))separator('\n\n')]
+[if (metaclass.eInverse()->isEmpty() and not metaclass.eAllSuperTypes->exists(e | not e.eInverse(EReference)->isEmpty()))]
+rule changeLeft2[metaclass.name/] {
+	from
+		compare: compareMM!Match ( thisModule.changedAttributesLeft(compare, '[metaclass.name/]') or 
+			thisModule.changedReferenceLeft(compare, '[metaclass.name/]') )
+	to
+		f: U[modelName/]MM![metaclass.name/] (
+			--relations
+			[for (ref : EReference | metaclass.eAllReferences)separator(',\n')]
+			[ref.name/] <- thisModule.getAddedLeftCollection(compare, '[ref.name/]')
+			[/for]
+		)
+	do {
+		compare.debug('[metaclass.name/]_changed_L'); 
+	}
+}
+[else]
+[if (metaclass.eInverse(EReference)->exists(e | e.upperBound = 1) or metaclass.eAllSuperTypes->exists(e | e.eInverse(EReference)->exists(e | e.upperBound = 1)))]
+rule changeLeft2[metaclass.name/] {
+	from
+		compare: compareMM!Match ( thisModule.changedAttributesLeft(compare, 'Member') or 
+			thisModule.changedReferenceLeft(compare, 'Member') )
+	to
+		f: U[modelName/]MM![metaclass.name/] (
+			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
+			[attr.name/] <- thisModule.getAttribute(compare, '[attr.name/]', 'left')
+			[/for]
+			--relations
+			[for (ref : EReference | metaclass.eAllReferences)separator(',')]
+			[ref.name/] <- thisModule.getReference(compare, '[ref.name/]', 'left')
+			[/for]
+		)
+	do {
+		compare.debug('[metaclass.name/]_changed_L'); 
+	}
+}
+[else]
+rule changeLeft2[metaclass.name/] {
+	from
+		compare: compareMM!Match ( 
+			(thisModule.changedAttributesLeft(compare, '[metaclass.name/]') and not thisModule.changedAttributesRight(compare, '[metaclass.name/]'))
+			or 
+			(thisModule.changedReferenceLeft(compare, '[metaclass.name/]') and not thisModule.changedReferenceRight(compare, '[metaclass.name/]'))
+			)
+	to
+		f: U[modelName/]MM![metaclass.name/] (
+			--attribute
+			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
+			[attr.name/] <- thisModule.getAttribute(compare, '[attr.name/]', 'left')
+			[/for]
+
+			--relations
+			[for (ref : EReference | metaclass.eAllReferences)separator(',')]
+			[if (ref.upperBound = 1)]
+			[ref.name/] <- thisModule.getUnchangedElementsByNameSingle(compare, '[ref.name/]')
+			[else]
+			[ref.name/] <- thisModule.getUnchangedElementsByNameCollection(compare,
+					'[ref.name/]') -> append(thisModule.getAddedLeftCollection(compare,
+					'[ref.name/]')) -> append(thisModule.getAddedRightCollection(compare,
+					'[ref.name/]'))
+			[/if]
+			[/for]
+		)
+	do {
+		compare.debug('[metaclass.name/]_changed_L'); 
+	}
+}
+[/if]
+[/if]
+[/for]
+
+------------------------------------ Changed Left -------------------------------------
+------------------------------------ Changed Right ------------------------------------
+
+[for (metaclass : EClass | model.eContents(EClass))separator('\n\n')]
+[if (metaclass.eInverse()->isEmpty() and not metaclass.eAllSuperTypes->exists(e | not e.eInverse(EReference)->isEmpty()))]
+
+rule changeRight2[metaclass.name/] {
+	from
+		compare: compareMM!Match ( thisModule.changedAttributesRight(compare, '[metaclass.name/]') or 
+			thisModule.changedReferenceRight(compare, '[metaclass.name/]') )
+	to
+		f: U[modelName/]MM![metaclass.name/] (
+			--relations
+			[for (ref : EReference | metaclass.eAllReferences)separator(',')]
+			[ref.name/] <- thisModule.getAddedRightCollection(compare, '[ref.name/]')
+			[/for]
+		)
+	do {
+		compare.debug('[metaclass.name/]_changed_R'); 
+	}
+}
+
+[else]
+[if (metaclass.eInverse(EReference)->exists(e | e.upperBound = 1) or metaclass.eAllSuperTypes->exists(e | e.eInverse(EReference)->exists(e | e.upperBound = 1)))]
+
+rule changeRight2[metaclass.name/] {
+	from
+		compare: compareMM!Match (
+			thisModule.changedAttributesRight(compare, '[metaclass.name/]') or thisModule.
+					changedReferenceRight(compare, '[metaclass.name/]')
+		)
+	to
+		f: U[modelName/]MM![metaclass.name/] (
+			--attribute
+			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
+			[attr.name/] <- thisModule.getAttribute(compare, '[attr.name/]', 'right')
+			[/for] 
+
+			--relations
+			[for (ref : EReference | metaclass.eAllReferences)separator(',')]
+			[ref.name/] <- thisModule.getReference(compare, '[ref.name/]', 'right')
+			[/for]
+		)
+	do {
+		compare.debug('[metaclass.name/]_changed_R'); 
+	}
+}
+[else]
+rule changeRight2[metaclass.name/] {
+	from
+		compare: compareMM!Match (
+			(thisModule.changedAttributesRight(compare, '[metaclass.name/]') and not thisModule.changedAttributesLeft(compare, '[metaclass.name/]')) 
+			or 
+			(thisModule.changedReferenceRight(compare, '[metaclass.name/]') and not thisModule.changedReferenceLeft(compare, '[metaclass.name/]'))
+			)
+	to
+		f: U[modelName/]MM![metaclass.name/] (
+			--attribute
+			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
+			[attr.name/] <- thisModule.getAttribute(compare, '[attr.name/]', 'right')
+			[/for]
+			
+			--relations
+			[for (ref : EReference | metaclass.eAllReferences)separator(',')]
+			[if (ref.upperBound = 1)]
+			[ref.name/] <- thisModule.getUnchangedElementsByNameSingle(compare, '[ref.name/]')
+			[else]
+			[ref.name/] <- thisModule.getUnchangedElementsByNameCollection(compare, '[ref.name/]') ->
+					append(thisModule.getAddedLeftCollection(compare, '[ref.name/]')) ->
+					append(thisModule.getAddedRightCollection(compare, '[ref.name/]'))
+			[/if]
+			[/for]
+		)
+	do {
+		compare.debug('[metaclass.name/]_changed_R'); 
+	}
+}
+[/if]
+[/if]
+[/for]
+
+------------------------------------ Changed Right ------------------------------------
+-------------------------------------- Conflicts --------------------------------------
+
+[for (metaclass : EClass | model.eContents(EClass))separator('\n\n')]
+[if (metaclass.eInverse()->isEmpty() and not metaclass.eAllSuperTypes->exists(e | not e.eInverse(EReference)->isEmpty()))]
+[comment FamilyRegistry/]
+[else]
+[if (metaclass.eInverse(EReference)->exists(e | e.upperBound = 1) or metaclass.eAllSuperTypes->exists(e | e.eInverse(EReference)->exists(e | e.upperBound = 1)))]
+rule ConflictA[metaclass.name/] {
+	from
+		match: compareMM!Match (
+			thisModule.conflictingAttributes(match, '[metaclass.name/]') or thisModule.
+					conflictingReference(match, '[metaclass.name/]')
+		)
+	to
+		f: U[modelName/]MM!u[metaclass.name/] (
+			uleft <- left,
+			uright <- right,
+			utype <- #OR
+		),
+		left: U[modelName/]MM![metaclass.name/] (
+			--attribute
+			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
+			[attr.name/] <- thisModule.getAttribute(match, '[attr.name/]', 'left')
+			[/for]
+
+			--relations
+			[for (ref : EReference | metaclass.eAllReferences)separator(',')]
+			[ref.name/] <- thisModule.getReference(match, '[ref.name/]', 'left')
+			[/for]
+		),
+		right: U[modelName/]MM![metaclass.name/] (
+			--attribute
+			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
+			[attr.name/] <- thisModule.getAttribute(match, '[attr.name/]', 'right')
+			[/for]
+			
+			--relations
+			[for (ref : EReference | metaclass.eAllReferences)separator(',')]
+			[ref.name/] <- thisModule.getReference(match, '[ref.name/]', 'right')
+			[/for]
+		)
+	do {
+		match.debug('[metaclass.name/]_conflict'); 
+	}
+}
+[else]
+rule ConflictA[metaclass.name/] {
+	from
+		compare: compareMM!Match (
+			thisModule.conflictingAttributes(compare, '[metaclass.name/]') or thisModule.
+					conflictingReference(compare, '[metaclass.name/]')
+		)
+	to
+		f: U[modelName/]MM!u[metaclass.name/] (
+			uleft <- left,
+			uright <- right,
+			utype <- #OR
+		),
+		left: U[modelName/]MM![metaclass.name/] (
+			--attributes
+			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
+			[attr.name/] <- thisModule.getAttribute(compare, '[attr.name/]', 'left')
+			[/for]
+			
+			--relations
+			[for (ref : EReference | metaclass.eAllReferences)separator(',')]
+			[if (ref.upperBound = 1)]
+			[ref.name/] <- thisModule.cloneMembers(compare.origin.[ref.name/])
+			[else]
+			[ref.name/] <- compare.origin.[ref.name/] -> collect(e |thisModule.cloneMembers(e))
+			[/if]
+			[/for]
+		),
+		right: U[modelName/]MM![metaclass.name/] (
+			--attributes
+			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
+			[attr.name/] <- thisModule.getAttribute(compare, '[attr.name/]', 'right')
+			[/for]
+			
+			--relations
+			[for (ref : EReference | metaclass.eAllReferences)separator(',')]
+			[if (ref.upperBound = 1)]
+			[ref.name/] <- thisModule.cloneMembers(compare.origin.[ref.name/])
+			[else]
+			[ref.name/] <- compare.origin.[ref.name/] -> collect(e |thisModule.cloneMembers(e))
+			[/if]
+			[/for]
+		)
+	do {
+		compare.debug('[metaclass.name/]_conflict'); 
+	}
+}
+[/if]
+[/if]
+[/for]
+
+------------------------------------ Lazy rule --------------------------------------
+
+[for (metaclass : EClass | model.eContents(EClass))separator('\n\n')]
+[if (metaclass.eInverse()->isEmpty() and not metaclass.eAllSuperTypes->exists(e | not e.eInverse(EReference)->isEmpty()))]
+[comment FamilyRegistry/]
+[else]
+[if (metaclass.eInverse(EReference)->exists(e | e.upperBound = 1) or metaclass.eAllSuperTypes->exists(e | e.eInverse(EReference)->exists(e | e.upperBound = 1)))]
+lazy rule clone[metaclass.name/] {
+	from 
+		compare: U[modelName/]MM![metaclass.name/] (
+			thisModule.checkConservative(compare, '[metaclass.name/]') 
+		)
+	to 
+		[metaclass.name/]: U[modelName/]MM![metaclass.name/] (
+			--attributes
+			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
+			[attr.name/] <- compare.[attr.name/]
+			[/for]
+		)
+	do {
+		compare.debug('[metaclass.name/]_clone'); 
+	}
+}
+[else]
+[comment Family/]
+[/if]
+[/if]
+[/for]
 [/file]
 [/template]
