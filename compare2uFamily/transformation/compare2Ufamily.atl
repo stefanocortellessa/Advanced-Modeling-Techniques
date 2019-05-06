@@ -125,6 +125,7 @@ helper def: changedReferenceRight(cf: compareMM!Match, name: String): Boolean =
 -- ####################################################### RULES ####################################################### --
 
 ------------------------------------ Matches ------------------------------------
+
 rule match2member {
 	from
 		compare: compareMM!Match ( thisModule.checkConservative(compare, 'Member') and
@@ -186,6 +187,7 @@ rule match2family {
 
 ------------------------------------------ Matches --------------------------------------------
 ------------------------------------ Matches 4 -- uMembers------------------------------------
+
 rule match2uMember {
 	from
 		compare: compareMM!Match ( thisModule.checkConservative(compare, 'uMember') )
@@ -254,6 +256,7 @@ rule match2uFamily {
 
 ------------------------------------ Matches 4 -- uMembers------------------------------------
 ------------------------------------------ Added Left ----------------------------------------
+
 rule addedLeft2member {
 	from
 		compare: compareMM!Match ( thisModule.addedElementLeft(compare, 'Member') )
@@ -352,7 +355,8 @@ rule addedLeft2uFamily {
 }
 
 ------------------------------------ Added Left ------------------------------------
------------------------------------- Added Right ------------------------------------
+------------------------------------ Added Right -----------------------------------
+
 rule addedRight2member {
 	from
 		compare: compareMM!Match ( thisModule.addedElementRight(compare, 'Member') )
@@ -451,6 +455,7 @@ rule addedRight2uFamily {
 }
 
 ------------------------------------ Added Right ------------------------------------
+
 rule changeLeftandRight2family {
 	from compare: compareMM!Match (
 		(thisModule.changedAttributesLeft(compare, 'Family') and thisModule.changedAttributesRight(compare, 'Family'))
@@ -482,6 +487,7 @@ rule changeLeftandRight2family {
 }
 
 ------------------------------------ Changed Left ------------------------------------
+
 rule changeLeft2familyRegistry {
 	from
 		compare: compareMM!Match ( thisModule.changedAttributesLeft(compare, 'FamilyRegistry') or 
@@ -546,6 +552,7 @@ rule changeLeft2member {
 
 ------------------------------------ Changed Left -------------------------------------
 ------------------------------------ Changed Right ------------------------------------
+
 rule changeRight2familyRegistry {
 	from
 		compare: compareMM!Match ( thisModule.changedAttributesRight(compare, 'FamilyRegistry') or 
@@ -612,6 +619,7 @@ rule changeRight2member {
 
 ------------------------------------ Changed Right ------------------------------------
 -------------------------------------- Conflicts --------------------------------------
+
 rule ConflictAMember {
 	from
 		match: compareMM!Match (
