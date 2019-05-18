@@ -135,7 +135,7 @@ helper def: changedReferenceRight(cf: compareMM!Match, name: String): Boolean =
 ------------------------------------ Matches ------------------------------------
 
 [for (metaclass : EClass | model.eContents(EClass))separator('\n\n')]
-[if (metaclass.eInverse()->isEmpty() and not metaclass.eAllSuperTypes->exists(e | not e.eInverse(EReference)->isEmpty()))]
+[if (metaclass.eInverse()->isEmpty() and not metaclass.eAllSuperTypes->exists(e | not e.eInverse(EReference)->isEmpty()))] [comment FamilyRegistry/]
 rule match2[metaclass.name/] {
 	from
 		compare: compareMM!Match (thisModule.checkConservative(compare, '[metaclass.name/]') )
@@ -155,7 +155,7 @@ rule match2[metaclass.name/] {
 }
 [else]
 [if (metaclass.eInverse(EReference)->exists(e | e.upperBound = 1) or metaclass.eAllSuperTypes->exists(e | e.eInverse(EReference)->exists(e | e.upperBound = 1)))]
-rule match2[metaclass.name/] {
+rule match2[metaclass.name/] { [comment Member/]
 	from
 		compare: compareMM!Match ( thisModule.checkConservative(compare, '[metaclass.name/]') and
 									not thisModule.checkContainerConflict(compare, '[metaclass.name/]'))
@@ -164,7 +164,7 @@ rule match2[metaclass.name/] {
 			--attributes
 			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
 			[attr.name/] <- thisModule.getAttributeOrigin(compare, '[attr.name/]')
-			[/for]
+			[/for],
 
 			--relations
 			[for (ref : EReference | metaclass.eAllReferences)separator(',')]
@@ -176,15 +176,15 @@ rule match2[metaclass.name/] {
 	}
 }
 [else]
-rule match2[metaclass.name/] {
+rule match2[metaclass.name/] { [comment Family/]
 	from
-		compare: compareMM!Match ( thisModule.checkConservative(compare, 'Family'))
+		compare: compareMM!Match ( thisModule.checkConservative(compare, '[metaclass.name/]'))
 	to
-		f: U[modelName/]MM!Family (
+		f: U[modelName/]MM![metaclass.name/] (
 			--attributes
 			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
 			[attr.name/] <- thisModule.getAttribute(compare, '[attr.name/]', 'left')
-			[/for]
+			[/for],
 
 			--relations
 			[for (ref : EReference | metaclass.eAllReferences)separator(',')]
@@ -214,10 +214,11 @@ rule match2u[metaclass.name/] {
 		f: U[modelName/]MM!u[metaclass.name/] (
 
 			--attribute
-			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
-			[attr.name/] <- thisModule.getAttributeOrigin(compare, '[attr.name/]')
-			[/for]
-
+			[if (not metaclass.eAllAttributes->isEmpty())]
+				[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
+				[attr.name/] <- thisModule.getAttributeOrigin(compare, '[attr.name/]')
+				[/for],
+			[/if]
 			--relations
 			
 			uleft <- thisModule.getUnchangedElementsByNameCollection(compare, 'uleft') ->
@@ -265,7 +266,7 @@ rule addedLeft2[metaclass.name/] {
 			--attributes
 			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
 			[attr.name/] <- thisModule.getAttribute(compare, '[attr.name/]', 'left')
-			[/for]
+			[/for],
 			--relations
 			[for (ref : EReference | metaclass.eAllReferences)separator(',')]
 			[ref.name/] <- thisModule.getAddedLeftSingle(compare, '[ref.name/]')
@@ -275,7 +276,7 @@ rule addedLeft2[metaclass.name/] {
 		compare.debug('[metaclass.name/]_add_L'); 
 	}
 }
-[else]
+[else] 
 rule addedLeft2[metaclass.name/] {
 	from
 		compare: compareMM!Match ( thisModule.addedElementLeft(compare, '[metaclass.name/]') )
@@ -284,7 +285,7 @@ rule addedLeft2[metaclass.name/] {
 			--attributes
 			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
 			[attr.name/] <- thisModule.getAttribute(compare, 'lastName', 'left')
-			[/for]
+			[/for],
 			--relations
 			[for (ref : EReference | metaclass.eAllReferences)separator(',')]
 			[if (ref.upperBound = 1)]
@@ -309,10 +310,14 @@ rule addedLeft2u[metaclass.name/] {
 		compare: compareMM!Match ( thisModule.addedElementLeft(compare, 'u[metaclass.name/]') )
 	to
 		f: U[modelName/]MM!u[metaclass.name/] (
+			
 			--attribute
-			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
-			[attr.name/] <- thisModule.getAttribute(compare, '[attr.name/]', 'left'),
-			[/for]
+			[if (not metaclass.eAllAttributes->isEmpty())]
+				[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
+				[attr.name/] <- thisModule.getAttribute(compare, '[attr.name/]', 'left')
+				[/for],
+			[/if]
+
 			--relations			
 			uleft <- thisModule.getAddedLeftCollection(compare, 'uleft'),
 			uright <- thisModule.getAddedLeftCollection(compare, 'uright'),
@@ -353,7 +358,7 @@ rule addedRight2[metaclass.name/] {
 			--attributes
 			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
 			[attr.name/] <- thisModule.getAttribute(compare, '[attr.name/]', 'right')
-			[/for]
+			[/for],
 			--relations
 			[for (ref : EReference | metaclass.eAllReferences)separator(',')]
 			[ref.name/] <- thisModule.getAddedRightSingle(compare, '[ref.name/]')
@@ -372,7 +377,7 @@ rule addedRight2[metaclass.name/] {
 			--attributes
 			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
 			[attr.name/] <- thisModule.getAttribute(compare, 'lastName', 'right')
-			[/for]
+			[/for],
 			--relations
 			[for (ref : EReference | metaclass.eAllReferences)separator(',')]
 			[if (ref.upperBound = 1)]
@@ -397,10 +402,14 @@ rule addedRight2u[metaclass.name/] {
 		compare: compareMM!Match ( thisModule.addedElementRight(compare, 'u[metaclass.name/]') )
 	to
 		f: U[modelName/]MM!u[metaclass.name/] (
+
 			--attribute
-			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
-			[attr.name/] <- thisModule.getAttribute(compare, '[attr.name/]', 'right'),
-			[/for]
+			[if (not metaclass.eAllAttributes->isEmpty())]
+				[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
+				[attr.name/] <- thisModule.getAttribute(compare, '[attr.name/]', 'right')
+				[/for],
+			[/if]
+
 			--relations			
 			uleft <- thisModule.getAddedRightCollection(compare, 'uleft'),
 			uright <- thisModule.getAddedRightCollection(compare, 'uright'),
@@ -432,7 +441,7 @@ rule changeLeftandRight2[metaclass.name/] {
 			--attribute
 			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
 			[attr.name/] <- thisModule.getAttribute(compare, '[attr.name/]', 'origin')
-			[/for]
+			[/for],
 			--relations
 			[for (ref : EReference | metaclass.eAllReferences)separator(',')]
 			[if (ref.upperBound = 1) ]
@@ -481,7 +490,7 @@ rule changeLeft2[metaclass.name/] {
 		f: U[modelName/]MM![metaclass.name/] (
 			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
 			[attr.name/] <- thisModule.getAttribute(compare, '[attr.name/]', 'left')
-			[/for]
+			[/for],
 			--relations
 			[for (ref : EReference | metaclass.eAllReferences)separator(',')]
 			[ref.name/] <- thisModule.getReference(compare, '[ref.name/]', 'left')
@@ -504,7 +513,7 @@ rule changeLeft2[metaclass.name/] {
 			--attribute
 			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
 			[attr.name/] <- thisModule.getAttribute(compare, '[attr.name/]', 'left')
-			[/for]
+			[/for],
 
 			--relations
 			[for (ref : EReference | metaclass.eAllReferences)separator(',')]
@@ -562,7 +571,7 @@ rule changeRight2[metaclass.name/] {
 			--attribute
 			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
 			[attr.name/] <- thisModule.getAttribute(compare, '[attr.name/]', 'right')
-			[/for] 
+			[/for],
 
 			--relations
 			[for (ref : EReference | metaclass.eAllReferences)separator(',')]
@@ -586,7 +595,7 @@ rule changeRight2[metaclass.name/] {
 			--attribute
 			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
 			[attr.name/] <- thisModule.getAttribute(compare, '[attr.name/]', 'right')
-			[/for]
+			[/for],
 			
 			--relations
 			[for (ref : EReference | metaclass.eAllReferences)separator(',')]
@@ -631,7 +640,7 @@ rule ConflictA[metaclass.name/] {
 			--attribute
 			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
 			[attr.name/] <- thisModule.getAttribute(match, '[attr.name/]', 'left')
-			[/for]
+			[/for],
 
 			--relations
 			[for (ref : EReference | metaclass.eAllReferences)separator(',')]
@@ -642,7 +651,7 @@ rule ConflictA[metaclass.name/] {
 			--attribute
 			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
 			[attr.name/] <- thisModule.getAttribute(match, '[attr.name/]', 'right')
-			[/for]
+			[/for],
 			
 			--relations
 			[for (ref : EReference | metaclass.eAllReferences)separator(',')]
@@ -670,7 +679,7 @@ rule ConflictA[metaclass.name/] {
 			--attributes
 			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
 			[attr.name/] <- thisModule.getAttribute(compare, '[attr.name/]', 'left')
-			[/for]
+			[/for],
 			
 			--relations
 			[for (ref : EReference | metaclass.eAllReferences)separator(',')]
@@ -685,7 +694,7 @@ rule ConflictA[metaclass.name/] {
 			--attributes
 			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
 			[attr.name/] <- thisModule.getAttribute(compare, '[attr.name/]', 'right')
-			[/for]
+			[/for],
 			
 			--relations
 			[for (ref : EReference | metaclass.eAllReferences)separator(',')]
