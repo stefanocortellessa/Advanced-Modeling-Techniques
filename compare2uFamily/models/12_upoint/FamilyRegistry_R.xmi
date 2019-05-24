@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Families:FamilyRegistry
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Families="http://it.univaq.disim/uncertainty.ufamily"
+    xmlns:uncertainty="uncertainty"
+    xsi:schemaLocation="uncertainty http://it.univaq.disim/uncertainty.ufamily#//uncertainty">
+  <families
+      xsi:type="Families:Family"
+      lastName="Cortellessa">
+    <sons xsi:type="Families:Member"
+        firstName="Stefano"/>
+    <sons xsi:type="uncertainty:uMember"
+        name="luca">
+      <uleft
+          xsi:type="Families:Member"
+          firstName="luca1"
+          age="12"/>
+      <uright
+          xsi:type="Families:Member"
+          firstName="luca2"/>
+    </sons>
+  </families>
+</Families:FamilyRegistry>

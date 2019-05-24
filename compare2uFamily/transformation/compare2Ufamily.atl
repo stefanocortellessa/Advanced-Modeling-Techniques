@@ -7,9 +7,11 @@ create OUT: UFamiliesMM from IN: compareMM;
 -- ###################################################### HELPERS ###################################################### --
 
 helper def: checkConservative(cf: compareMM!Match, name: String): Boolean =
-	not cf.origin.oclIsUndefined() and not cf.left.oclIsUndefined() and not cf.right.
-			oclIsUndefined() and (name = cf.origin.oclType().name) and
-			cf.differences->isEmpty();
+	not cf.origin.oclIsUndefined() and 
+	not cf.left.oclIsUndefined() and 
+	not cf.right.oclIsUndefined() and 
+	(name = cf.origin.oclType().name) and
+	cf.differences->isEmpty();
 
 helper def: checkContainerConflict(cf: compareMM!Match, name: String): Boolean =
 	if (name = cf.origin.oclType().name)
@@ -100,9 +102,34 @@ helper def: getAttributeChanged(match: compareMM!Match, name: String, direction:
 
 ------------------------------------ References ------------------------------------
 
-helper def: getReferenceOrigin(Match: compareMM!Match, Reference: String): String =
-	Match.origin.refGetValue(Reference);
+helper def: getReferenceOrigin(Match: compareMM!Match): String =
+	--Match.origin.relatives; --refGetValue(Reference);
+	if (not Match.origin.relatives.oclIsUndefined()) then 
+                          compareMM!Match.allInstances()
+                            ->select(e | not e.origin.oclIsUndefined())
+                              ->select(e | e.origin.oclIsTypeOf(UFamiliesMM!Member))
+                                ->select(e | e.origin.firstName = Match.origin.relatives.firstName).first()
+                        else OclUndefined endif;
 
+helper def : getFamily_links (links_ref_changes : compareMM!ReferenceChange, Family_match : compareMM!Match) : Sequence(UFamiliesMM!Family) =
+  if (not links_ref_changes.first().oclIsUndefined()) 
+  then if (links_ref_changes.first().source = #LEFT) 
+      then compareMM!Match.allInstances()->select(e | not e.origin.oclIsUndefined())->select(e | e.origin.oclIsTypeOf(UFamiliesMM!Family))
+          ->select(e | Family_match.left.links->collect(e | e.lastName).includes(e.origin.lastName))
+      else compareMM!Match.allInstances()->select(e | not e.origin.oclIsUndefined())->select(e | e.origin.oclIsTypeOf(UFamiliesMM!Family))
+          ->select(e | Family_match.right.links->collect(e | e.lastName).includes(e.origin.lastName))
+      endif
+  else compareMM!Match.allInstances()->select(e | not e.origin.oclIsUndefined())->select(e | Family_match.origin.links.includes(e.origin)) endif;
+	
+helper def: getReferenceOriginLinks(Match: compareMM!Match, Reference: String): String =
+	--Match.origin.links; --refGetValue(Reference);
+	if (not Match.origin.links.oclIsUndefined()) then 
+                          compareMM!Match.allInstances()
+                            ->select(e | not e.origin.oclIsUndefined())
+                            ->select(e | e.origin.oclIsTypeOf(UFamiliesMM!Family))
+                            ->select(e | e.origin.lastName = Match.origin.links.lastName).first()
+                        else OclUndefined endif;
+	
 helper def: getReference(Match: compareMM!Match, Reference: String, direction: String):
 		String =
 	Match.refGetValue(direction).refGetValue(Reference);
@@ -161,6 +188,14 @@ rule match2familyRegistry {
 rule match2family {
 	from
 		compare: compareMM!Match ( thisModule.checkConservative(compare, 'Family'))
+	using {    
+		noContainmentReferences : compareMM!ReferenceChange = compare.differences 
+								->select(e | e.oclIsTypeOf(compareMM!ReferenceChange))
+								->select(e | e.reference.containment = false);
+
+      	links : compareMM!ReferenceChange = noContainmentReferences 
+								->select(e | e.reference.name = 'links');      
+	}
 	to
 		f: UFamiliesMM!Family (
 			--attributes
@@ -176,9 +211,7 @@ rule match2family {
 					'daughters') -> append(thisModule.getAddedLeftCollection(compare,
 					'daughters')) -> append(thisModule.getAddedRightCollection(compare,
 					'daughters')),
-			links <- thisModule.getReferenceOrigin(compare, 'links') ->
-					append(thisModule.getAddedLeftCollection(compare, 'links')) ->
-					append(thisModule.getAddedRightCollection(compare, 'links'))
+			links <- thisModule.getFamily_links(links, compare)
 		)
 	do {
 		compare.debug('Family_match'); 
@@ -543,7 +576,7 @@ rule changeLeft2member {
 			age <- thisModule.getAttribute(compare, 'age', 'left'),
 			firstName <- thisModule.getAttribute(compare, 'firstName', 'left'),
 			--relations
-			relatives <- thisModule.getReference(compare, 'relatives', 'left')
+			relatives <- thisModule.getReferenceOrigin(compare, 'relatives')
 		)
 	do {
 		compare.debug('Member_changed_L'); 
@@ -610,7 +643,7 @@ rule changeRight2member {
 			age <- thisModule.getAttribute(compare, 'age', 'right'),
 			firstName <- thisModule.getAttribute(compare, 'firstName', 'right'),
 			--relations
-			relatives <- thisModule.getReference(compare, 'relatives', 'right')
+			relatives <- thisModule.getReferenceOrigin(compare, 'relatives')
 		)
 	do {
 		compare.debug('Member_changed_R'); 
@@ -628,8 +661,8 @@ rule ConflictAMember {
 		)
 	to
 		f: UFamiliesMM!uMember (
-			uleft <- left,
-			uright <- right,
+			uleft <- Sequence{}->append(left),
+			uright <- Sequence{}->append(right),
 			utype <- #OR
 		),
 		left: UFamiliesMM!Member (
