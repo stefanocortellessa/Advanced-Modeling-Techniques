@@ -43,27 +43,27 @@
     </eClassifiers>
     <eClassifiers xsi:type="ecore:EClass" name="uFamily" eSuperTypes="#//uncertainty/aFamily #//uncertainty/UData">
       <eStructuralFeatures xsi:type="ecore:EReference" name="uleft" upperBound="-1"
-          eType="#//Family" containment="true"/>
+          eType="#//uncertainty/aFamily" containment="true"/>
       <eStructuralFeatures xsi:type="ecore:EReference" name="uright" upperBound="-1"
-          eType="#//Family" containment="true"/>
+          eType="#//uncertainty/aFamily" containment="true"/>
       <eStructuralFeatures xsi:type="ecore:EReference" name="upoint" upperBound="-1"
           eType="#//uncertainty/uFamily" containment="true"/>
     </eClassifiers>
     <eClassifiers xsi:type="ecore:EClass" name="aFamily" abstract="true"/>
     <eClassifiers xsi:type="ecore:EClass" name="uMember" eSuperTypes="#//uncertainty/aMember #//uncertainty/UData">
       <eStructuralFeatures xsi:type="ecore:EReference" name="uleft" upperBound="-1"
-          eType="#//Member" containment="true"/>
+          eType="#//uncertainty/aMember" containment="true"/>
       <eStructuralFeatures xsi:type="ecore:EReference" name="uright" upperBound="-1"
-          eType="#//Member" containment="true"/>
+          eType="#//uncertainty/aMember" containment="true"/>
       <eStructuralFeatures xsi:type="ecore:EReference" name="upoint" upperBound="-1"
           eType="#//uncertainty/uMember" containment="true"/>
     </eClassifiers>
     <eClassifiers xsi:type="ecore:EClass" name="aMember" abstract="true"/>
     <eClassifiers xsi:type="ecore:EClass" name="uFamilyRegistry" eSuperTypes="#//uncertainty/aFamilyRegistry #//uncertainty/UData">
       <eStructuralFeatures xsi:type="ecore:EReference" name="uleft" upperBound="-1"
-          eType="#//FamilyRegistry" containment="true"/>
+          eType="#//uncertainty/aFamilyRegistry" containment="true"/>
       <eStructuralFeatures xsi:type="ecore:EReference" name="uright" upperBound="-1"
-          eType="#//FamilyRegistry" containment="true"/>
+          eType="#//uncertainty/aFamilyRegistry" containment="true"/>
       <eStructuralFeatures xsi:type="ecore:EReference" name="upoint" upperBound="-1"
           eType="#//uncertainty/uFamilyRegistry" containment="true"/>
     </eClassifiers>
