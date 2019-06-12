@@ -129,7 +129,7 @@ helper def : get[metaclass.name/]_links ([ref.name/]_ref_changes : compareMM!Ref
       else compareMM!Match.allInstances()->select(e | not e.origin.oclIsUndefined())->select(e | e.origin.oclIsTypeOf(U[model.name/]MM![metaclass.name/]))
           ->select(e | [metaclass.name/]_match.right.[ref.name/]->collect(e | e.lastName).includes(e.origin.lastName))
       endif
-  else compareMM!Match.allInstances()->select(e | not e.origin.oclIsUndefined())->select(e | Family_match.origin.[ref.name/].includes(e.origin)) endif;
+  else compareMM!Match.allInstances()->select(e | not e.origin.oclIsUndefined())->select(e | [metaclass.name/]_match.origin.[ref.name/].includes(e.origin)) endif;
 [/if][/if][/for][/for]
 
 helper def: getReference(Match: compareMM!Match, Reference: String, direction: String):
@@ -210,14 +210,15 @@ rule match2[metaclass.name/] { [comment Family/]
 		[/if][/for] 
 	}
 	to
-		f: U[modelName/]MM![metaclass.name/] (
+		fop: U[modelName/]MM![metaclass.name/] (
 			--attributes
 			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
 			[attr.name/] <- thisModule.getAttribute(compare, '[attr.name/]', 'left')
 			[/for],
 
 			--relations
-			[for (ref : EReference | metaclass.eAllReferences)separator(',')] [if (ref.containment = true)]
+			[for (ref : EReference | metaclass.eAllReferences)separator(',')] 
+			[if (ref.containment = true)]
 			[if (ref.upperBound = 1)]
 			[ref.name/] <- thisModule.getUnchangedElementsByNameSingle(compare, '[ref.name/]')
 			[else]
@@ -226,8 +227,7 @@ rule match2[metaclass.name/] { [comment Family/]
 					append(thisModule.getAddedRightCollection(compare, '[ref.name/]'))
 			[/if]
 			[/if]
-			[/for]
-			[for (ref : EReference | metaclass.eAllReferences)] [if (ref.containment = false)]
+			[if (ref.containment = false)]
 			[ref.name/] <- thisModule.get[metaclass.name/]_[ref.name/]([ref.name/], compare)
 			[/if]
 			[/for]
@@ -385,7 +385,7 @@ rule addedRight2[metaclass.name/] {
 	from
 		compare: compareMM!Match ( thisModule.addedElementRight(compare, '[metaclass.name/]') )
 	to
-		f: UFamiliesMM![metaclass.name/] (
+		f: U[modelName/]MM![metaclass.name/] (
 			--attributes
 			[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
 			[attr.name/] <- thisModule.getAttribute(compare, '[attr.name/]', 'right')
