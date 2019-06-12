@@ -20,5 +20,6 @@ Taking into account the two Use Cases, to run them is necessary to know how to r
 - **ATL code** is in *'Transformation'* folder (e.g. compare2Ufamily.atl)
 - **Metamodels** are in *'Metamodels'* folder (e.g. Compare.ecore and UFamily.ecore)
 - **Source Models** are located in the *'Models'* folder, in the sub-folder *'Case n'*. 
+
   For each sub-folder there is a compare.xmi model that represent the source model for that case.
-- **Target Model** is in the *'Transformation'* folder.
+- **Target Model** is in the *'Transformation'* folder (e.g. out.xmi).
