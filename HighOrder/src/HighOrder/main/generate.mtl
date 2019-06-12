@@ -108,8 +108,29 @@ helper def: getAttributeChanged(match: compareMM!Match, name: String, direction:
 
 ------------------------------------ References ------------------------------------
 
-helper def: getReferenceOrigin(Match: compareMM!Match, Reference: String): String =
-	Match.origin.refGetValue(Reference);
+[for (metaclass : EClass | model.eContents(EClass))]
+[for (ref : EReference | metaclass.eAllReferences)] [if (ref.containment = false)] [if (ref.upperBound = 1)]
+helper def: get[metaclass.name/]_[ref.name/](Match: compareMM!Match): String =
+	if (not Match.origin.[ref.name/].oclIsUndefined()) then 
+                          compareMM!Match.allInstances()
+                            ->select(e | not e.origin.oclIsUndefined())
+                              ->select(e | e.origin.oclIsTypeOf(U[model.name/]MM![metaclass.name/]))
+                                ->select(e | (e.origin = Match.origin.[ref.name/])).first()
+                        else OclUndefined endif;
+[/if][/if][/for][/for]
+
+[for (metaclass : EClass | model.eContents(EClass))]
+[for (ref : EReference | metaclass.eAllReferences)] [if (ref.containment = false)] [if (ref.upperBound <> 1)]
+helper def : get[metaclass.name/]_links ([ref.name/]_ref_changes : compareMM!ReferenceChange, [metaclass.name/]_match : compareMM!Match) : Sequence(U[model.name/]MM![metaclass.name/]) =
+  if (not [ref.name/]_ref_changes.first().oclIsUndefined()) 
+  then if ([ref.name/]_ref_changes.first().source = #LEFT) 
+      then compareMM!Match.allInstances()->select(e | not e.origin.oclIsUndefined())->select(e | e.origin.oclIsTypeOf(U[model.name/]MM![metaclass.name/]))
+          ->select(e | [metaclass.name/]_match.left.[ref.name/]->collect(e | e.lastName).includes(e.origin.lastName))
+      else compareMM!Match.allInstances()->select(e | not e.origin.oclIsUndefined())->select(e | e.origin.oclIsTypeOf(U[model.name/]MM![metaclass.name/]))
+          ->select(e | [metaclass.name/]_match.right.[ref.name/]->collect(e | e.lastName).includes(e.origin.lastName))
+      endif
+  else compareMM!Match.allInstances()->select(e | not e.origin.oclIsUndefined())->select(e | Family_match.origin.[ref.name/].includes(e.origin)) endif;
+[/if][/if][/for][/for]
 
 helper def: getReference(Match: compareMM!Match, Reference: String, direction: String):
 		String =
@@ -153,8 +174,7 @@ rule match2[metaclass.name/] {
 		compare.debug('[metaclass.name/]_match'); 
 	}
 }
-[else]
-[if (metaclass.eInverse(EReference)->exists(e | e.upperBound = 1) or metaclass.eAllSuperTypes->exists(e | e.eInverse(EReference)->exists(e | e.upperBound = 1)))]
+[elseif (metaclass.eInverse(EReference)->exists(e | e.upperBound = 1) or metaclass.eAllSuperTypes->exists(e | e.eInverse(EReference)->exists(e | e.upperBound = 1)))]
 rule match2[metaclass.name/] { [comment Member/]
 	from
 		compare: compareMM!Match ( thisModule.checkConservative(compare, '[metaclass.name/]') and
@@ -168,7 +188,7 @@ rule match2[metaclass.name/] { [comment Member/]
 
 			--relations
 			[for (ref : EReference | metaclass.eAllReferences)separator(',')]
-			[ref.name/] <- thisModule.getReferenceOrigin(compare, '[ref.name/]')
+			[ref.name/] <- thisModule.get[metaclass.name/]_[ref.name/](compare)
 			[/for]
 		)
 	do {
@@ -179,6 +199,16 @@ rule match2[metaclass.name/] { [comment Member/]
 rule match2[metaclass.name/] { [comment Family/]
 	from
 		compare: compareMM!Match ( thisModule.checkConservative(compare, '[metaclass.name/]'))
+	using {    
+		noContainmentReferences : compareMM!ReferenceChange = compare.differences 
+								->select(e | e.oclIsTypeOf(compareMM!ReferenceChange))
+								->select(e | e.reference.containment = false);
+
+		[for (ref : EReference | metaclass.eAllReferences)] [if (ref.containment = false)]
+      	[ref.name/] : compareMM!ReferenceChange = noContainmentReferences 
+								->select(e | e.reference.name = '[ref.name/]');     
+		[/if][/for] 
+	}
 	to
 		f: U[modelName/]MM![metaclass.name/] (
 			--attributes
@@ -187,7 +217,7 @@ rule match2[metaclass.name/] { [comment Family/]
 			[/for],
 
 			--relations
-			[for (ref : EReference | metaclass.eAllReferences)separator(',')]
+			[for (ref : EReference | metaclass.eAllReferences)separator(',')] [if (ref.containment = true)]
 			[if (ref.upperBound = 1)]
 			[ref.name/] <- thisModule.getUnchangedElementsByNameSingle(compare, '[ref.name/]')
 			[else]
@@ -195,13 +225,17 @@ rule match2[metaclass.name/] { [comment Family/]
 					append(thisModule.getAddedLeftCollection(compare, '[ref.name/]')) ->
 					append(thisModule.getAddedRightCollection(compare, '[ref.name/]'))
 			[/if]
+			[/if]
+			[/for]
+			[for (ref : EReference | metaclass.eAllReferences)] [if (ref.containment = false)]
+			[ref.name/] <- thisModule.get[metaclass.name/]_[ref.name/]([ref.name/], compare)
+			[/if]
 			[/for]
 		)
 	do {
 		compare.debug('[metaclass.name/]_match'); 
 	}
 }
-[/if]
 [/if]
 [/for]
 
@@ -214,11 +248,8 @@ rule match2u[metaclass.name/] {
 		f: U[modelName/]MM!u[metaclass.name/] (
 
 			--attribute
-			[if (not metaclass.eAllAttributes->isEmpty())]
-				[for (attr : EAttribute | metaclass.eAllAttributes)separator(',')]
-				[attr.name/] <- thisModule.getAttributeOrigin(compare, '[attr.name/]')
-				[/for],
-			[/if]
+			name <- thisModule.getAttributeOrigin(compare, 'name'),
+
 			--relations
 			
 			uleft <- thisModule.getUnchangedElementsByNameCollection(compare, 'uleft') ->
@@ -493,7 +524,7 @@ rule changeLeft2[metaclass.name/] {
 			[/for],
 			--relations
 			[for (ref : EReference | metaclass.eAllReferences)separator(',')]
-			[ref.name/] <- thisModule.getReference(compare, '[ref.name/]', 'left')
+			[ref.name/] <- thisModule.get[metaclass.name/]_[ref.name/](compare)
 			[/for]
 		)
 	do {
@@ -575,7 +606,7 @@ rule changeRight2[metaclass.name/] {
 
 			--relations
 			[for (ref : EReference | metaclass.eAllReferences)separator(',')]
-			[ref.name/] <- thisModule.getReference(compare, '[ref.name/]', 'right')
+			[ref.name/] <- thisModule.get[metaclass.name/]_[ref.name/](compare, '[ref.name/]', 'right')
 			[/for]
 		)
 	do {
