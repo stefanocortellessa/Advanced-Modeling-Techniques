@@ -1,4 +1,4 @@
-##Folder Organization
+## Folder Organization
 
 - The root folder is NOMECARTELLA 
   - HOT trasformation (**Acceleo** Code)
@@ -16,7 +16,7 @@
       - Models 
       - Transformation
    
-##Run Configurations
+## Run Configurations
 
 Taking into account the **two _Use Cases_**, to run them is necessary to know how to run the transformations:
 - **ATL code** is in *'Transformation'* folder (e.g. compare2Ufamily.atl)
