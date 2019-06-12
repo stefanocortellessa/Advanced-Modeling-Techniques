@@ -25,6 +25,7 @@ Taking into account the two Use Cases, to run them is necessary to know how to r
 
 Taking into account the HOT Transformation, to run it is necessary to know how to run the code (Run Configurations Settings):
 
+- **Project** : HighOrder
 - **Main Class** : HighOrder.main.Generate
 - **Model** is in the *'Metamodel'* folder (e.g. Family2.ecore)
 - **Target** is in the *'out'* folder
