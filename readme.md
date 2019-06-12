@@ -1,20 +1,19 @@
 ## Folder Organization
-
-- The root folder is NOMECARTELLA 
-  - HOT trasformation (**Acceleo** Code)
-  - Use Cases (**ATL** Projects)
-    - **Families Case**
-      - Metamodels
-      - Models 
-        - Case1
-        - Case2
-        - ...
-        - CaseN
-      - Transformation
-    - **University Case**
-      - Metamodels
-      - Models 
-      - Transformation
+ 
+- HOT trasformation (**Acceleo** Code)
+- Use Cases (**ATL** Projects)
+  - **Families Case**
+    - Metamodels
+    - Models 
+      - Case1
+      - Case2
+      - ...
+      - CaseN
+    - Transformation
+  - **University Case**
+    - Metamodels
+    - Models 
+    - Transformation
    
 ## Run Configurations
 
