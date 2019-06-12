@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<UniverityU:University
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:UniverityU="http://it.univaq.disim/universityU"
+    xmlns:uncertainty="uncertainty"
+    xsi:schemaLocation="uncertainty http://it.univaq.disim/universityU#//uncertainty">
+  <Courses xsi:type="UniverityU:Courses"
+      Name="AMT"
+      CFU="3"
+      Semester="Second"
+      links="//@Courses.1">
+    <Professor
+        xsi:type="UniverityU:Person"
+        Name="Pierantonio"/>
+    <Student
+        xsi:type="UniverityU:Person"
+        Name="Stefano Cortellessa"
+        Email="sc@gmail.com"/>
+    <Student
+        xsi:type="UniverityU:Person"
+        Name="Juri"/>
+    <Student
+        xsi:type="uncertainty:uPerson">
+      <uleft
+          xsi:type="UniverityU:Person"
+          Name="Stefano Di Francesco"
+          Email="stefano.difrancesco@student.univaq.it"/>
+      <uright
+          xsi:type="UniverityU:Person"
+          Name="Francesco Di Stefano"/>
+    </Student>
+  </Courses>
+  <Courses xsi:type="UniverityU:Courses"
+      Name="AVV"
+      CFU="3"
+      Semester="Second"
+      links="//@Courses.0">
+    <Professor
+        xsi:type="UniverityU:Person"
+        Name="Vittorio"/>
+    <Student
+        xsi:type="UniverityU:Person"
+        Name="Stefano1"
+        Email="stecort@gmail.com"/>
+    <Student
+        xsi:type="UniverityU:Person"
+        Name="Stefano2"/>
+  </Courses>
+</UniverityU:University>

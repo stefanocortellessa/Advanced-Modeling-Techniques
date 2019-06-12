@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<UniverityU:University
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:UniverityU="http://it.univaq.disim/universityU"
+    xsi:schemaLocation="http://it.univaq.disim/universityU ../../metamodels/UUniversity.ecore">
+  <Courses xsi:type="UniverityU:Courses"
+      Name="AMT"
+      CFU="3"
+      Semester="Second"
+      links="//@Courses.1">
+    <Professor
+        xsi:type="UniverityU:Person"
+        Name="Pierantonio"/>
+  </Courses>
+  <Courses xsi:type="UniverityU:Courses"
+      Name="AVV"
+      CFU="3"
+      Semester="Second"
+      links="//@Courses.0">
+    <Professor
+        xsi:type="UniverityU:Person"
+        Name="Cortellessa"/>
+  </Courses>
+</UniverityU:University>

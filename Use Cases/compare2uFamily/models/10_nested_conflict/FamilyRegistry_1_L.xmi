@@ -29,5 +29,8 @@
     <sons xsi:type="Families:Member"
         firstName="Stefano"
         age="25"/>
+    <father
+        xsi:type="Families:Member"
+        firstName="Donato"/>
   </families>
 </Families:FamilyRegistry>

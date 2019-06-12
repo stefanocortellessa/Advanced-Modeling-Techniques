@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+
+<!--
+-->
+
+<plugin>
+
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated UUniversity -->
+      <package
+            uri="http://it.univaq.disim/universityU"
+            class="UniverityU.UniverityUPackage"
+            genModel="metamodels/UUniversity.genmodel"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated UUniversity -->
+      <package
+            uri="uncertainty"
+            class="UniverityU.uncertainty.UncertaintyPackage"
+            genModel="metamodels/UUniversity.genmodel"/>
+   </extension>
+
+</plugin>

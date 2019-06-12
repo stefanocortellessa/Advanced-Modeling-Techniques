@@ -1,0 +1,805 @@
+
+-- @path compareMM=/compare2Ufamily/metamodels/compare.ecore
+-- @path UFamiliesMM=/compare2Ufamily/metamodels/UFamily.ecore
+
+module compare2UUniverity;
+create OUT: UUniverityMM from IN: compareMM;
+
+-- ###################################################### HELPERS ###################################################### --
+
+helper def: checkConservative(cf: compareMM!Match, name: String): Boolean =
+	not cf.origin.oclIsUndefined() and not cf.left.oclIsUndefined() and not cf.right.
+			oclIsUndefined() and (name = cf.origin.oclType().name) and
+			cf.differences->isEmpty();
+
+helper def: checkContainerConflict(cf: compareMM!Match, name: String): Boolean =
+	if (name = cf.origin.oclType().name)
+		then not cf.refImmediateComposite().differences->collect(e | e.conflict)->select(i | not i.oclIsUndefined())->isEmpty()
+		else false
+		endif;
+
+helper def: checkConflictMatch(cf: compareMM!Match, name: String): Boolean =
+	not cf.origin.oclIsUndefined() and not cf.left.oclIsUndefined() and not cf.right.
+			oclIsUndefined() and (name = cf.origin.oclType().name) and not cf.differences ->
+			isEmpty();
+
+helper def: changedAttributesLeft(cf: compareMM!Match, name: String): Boolean =
+	(not cf.differences -> select(e | e.source = #LEFT) -> select(e |
+			compareMM!AttributeChange.toString().endsWith(e.oclType().name)) ->
+			isEmpty())and 
+	(cf.differences -> select(e | not e.conflict.oclIsUndefined()) -> isEmpty()) and
+			(name = cf.left.oclType().name);
+
+helper def: changedAttributesRight(cf: compareMM!Match, name: String): Boolean =
+	(not cf.differences -> select(e | e.source = #RIGHT) -> select(e |
+			compareMM!AttributeChange.toString().endsWith(e.oclType().name)) ->
+			isEmpty()) and (cf.differences -> select(e | not e.conflict.oclIsUndefined())
+			-> isEmpty()) and (name = cf.right.oclType().name);
+
+helper def: conflictingAttributes(cf: compareMM!Match, name : String): Boolean =
+	(not cf.differences -> select(e | compareMM!AttributeChange.toString().endsWith(e.
+			oclType().name)) -> isEmpty()) and (not cf.differences -> select(e | not e.
+			conflict.oclIsUndefined()) -> isEmpty()) and
+			(name = cf.left.oclType().name);
+
+helper def: conflictingReference(cf: compareMM!Match, name : String): Boolean =
+	(not cf.differences -> select(e | compareMM!ReferenceChange.toString().endsWith(e.
+			oclType().name)) -> isEmpty()) and (not cf.differences -> select(e | not e.
+			conflict.oclIsUndefined()) -> isEmpty()) and
+			(name = cf.left.oclType().name);
+
+helper def: addedElementLeft(cf: compareMM!Match, name: String): Boolean =
+	cf.origin.oclIsUndefined() and not cf.left.oclIsUndefined() and cf.right.
+			oclIsUndefined() and (name = cf.left.oclType().name);
+
+helper def: addedElementRight(cf: compareMM!Match, name: String): Boolean =
+	cf.origin.oclIsUndefined() and cf.left.oclIsUndefined() and not cf.right.
+			oclIsUndefined() and (name = cf.right.oclType().name);
+
+helper def: getUnchangedElementsByNameCollection(cf: compareMM!Match, name: String):
+		Sequence(compareMM!Match) =
+	cf.submatches -> select(e | not e.origin.oclIsUndefined()) -> select(e | cf.origin.
+			refGetValue(name).includes(e.origin));
+
+helper def: getUnchangedElementsByNameSingle(cf: compareMM!Match, name: String):
+		compareMM!Match =
+	cf.submatches -> select(e | not e.origin.oclIsUndefined()) -> select(e | cf.origin.
+			refGetValue(name) = e.origin) -> first();
+
+helper def: getAddedLeftSingle(cf: compareMM!Match, name: String):
+		Sequence(compareMM!Match) =
+	cf.submatches -> select(e | not e.left.oclIsUndefined()) -> select(e | cf.left.
+			refGetValue(name) = e.left.eContainer().refGetValue(name)) -> first();
+
+helper def: getAddedLeftCollection(cf: compareMM!Match, name: String):
+		Sequence(compareMM!Match) =
+	cf.submatches -> select(e | not e.left.oclIsUndefined()) -> select(e | cf.left.
+			refGetValue(name).includes(e.left));
+
+helper def: getAddedRightSingle(cf: compareMM!Match, name: String):
+		Sequence(compareMM!Match) =
+	cf.submatches -> select(e | not e.left.oclIsUndefined()) -> select(e | cf.right.
+			refGetValue(name) = e.right.eContainer().refGetValue(name)) -> first();
+
+helper def: getAddedRightCollection(cf: compareMM!Match, name: String):
+		Sequence(compareMM!Match) =
+	cf.submatches -> select(e | not e.right.oclIsUndefined()) -> select(e | cf.right.
+			refGetValue(name).includes(e.right));
+
+helper def: getAttributeOrigin(Match: compareMM!Match, Attribute: String): String =
+	Match.origin.refGetValue(Attribute);
+
+helper def: getAttribute(Match: compareMM!Match, Attribute: String, direction: String):
+		String =
+	Match.refGetValue(direction).refGetValue(Attribute);
+
+--	Sequence{};
+helper def: getAttributeChanged(match: compareMM!Match, name: String, direction: String):
+		OclAny =
+	match.differences -> select(e | e.attribute.name = name).first().eContainer().
+			refGetValue(direction).refGetValue(name);
+
+------------------------------------ References ------------------------------------
+
+helper def: getPerson_relatives(Match: compareMM!Match): String =
+	if (not Match.origin.relatives.oclIsUndefined()) then 
+                          compareMM!Match.allInstances()
+                            ->select(e | not e.origin.oclIsUndefined())
+                              ->select(e | e.origin.oclIsTypeOf(UUniverityMM!Person))
+                                ->select(e | (e.origin = Match.origin.relatives)).first()
+                        else OclUndefined endif;
+
+helper def : getCourses_links (links_ref_changes : compareMM!ReferenceChange, Courses_match : compareMM!Match) : Sequence(UUniverityMM!Courses) =
+  if (not links_ref_changes.first().oclIsUndefined()) 
+  then if (links_ref_changes.first().source = #LEFT) 
+      then compareMM!Match.allInstances()->select(e | not e.origin.oclIsUndefined())->select(e | e.origin.oclIsTypeOf(UUniverityMM!Courses))
+          ->select(e | Courses_match.left.links->collect(e | e.lastName).includes(e.origin.lastName))
+      else compareMM!Match.allInstances()->select(e | not e.origin.oclIsUndefined())->select(e | e.origin.oclIsTypeOf(UUniverityMM!Courses))
+          ->select(e | Courses_match.right.links->collect(e | e.lastName).includes(e.origin.lastName))
+      endif
+  else compareMM!Match.allInstances()->select(e | not e.origin.oclIsUndefined())->select(e | Courses_match.origin.links.includes(e.origin)) endif;
+
+helper def: getReference(Match: compareMM!Match, Reference: String, direction: String):
+		String =
+	Match.refGetValue(direction).refGetValue(Reference);
+
+helper def: changedReferenceLeft(cf: compareMM!Match, name: String): Boolean =
+	(not cf.differences -> select(e | e.source = #LEFT) -> select(e |
+			compareMM!ReferenceChange.toString().endsWith(e.oclType().name)) ->
+			isEmpty()) and (cf.differences -> select(e | not e.conflict.oclIsUndefined())
+			-> isEmpty()) and (name = cf.left.oclType().name);
+
+helper def: changedReferenceRight(cf: compareMM!Match, name: String): Boolean =
+	(not cf.differences -> select(e | e.source = #RIGHT) -> select(e |
+			compareMM!ReferenceChange.toString().endsWith(e.oclType().name)) ->
+			isEmpty()) and (cf.differences -> select(e | not e.conflict.oclIsUndefined())
+			-> isEmpty()) and (name = cf.left.oclType().name);
+
+------------------------------------ References ------------------------------------
+
+-- ###################################################### HELPERS ###################################################### --
+-- ####################################################### RULES ####################################################### --
+
+------------------------------------ Matches ------------------------------------
+
+rule match2Courses { 
+	from
+		compare: compareMM!Match ( thisModule.checkConservative(compare, 'Courses'))
+	using {    
+		noContainmentReferences : compareMM!ReferenceChange = compare.differences 
+								->select(e | e.oclIsTypeOf(compareMM!ReferenceChange))
+								->select(e | e.reference.containment = false);
+
+      	links : compareMM!ReferenceChange = noContainmentReferences 
+								->select(e | e.reference.name = 'links');     
+	}
+	to
+		fop: UUniverityMM!Courses (
+			--attributes
+			Name <- thisModule.getAttribute(compare, 'Name', 'left')
+,			CFU <- thisModule.getAttribute(compare, 'CFU', 'left')
+,			Semester <- thisModule.getAttribute(compare, 'Semester', 'left')
+,
+
+			--relations
+			links <- thisModule.getCourses_links(links, compare)
+,			Professor <- thisModule.getUnchangedElementsByNameSingle(compare, 'Professor')
+,			Student <- thisModule.getUnchangedElementsByNameCollection(compare, 'Student') ->
+					append(thisModule.getAddedLeftCollection(compare, 'Student')) ->
+					append(thisModule.getAddedRightCollection(compare, 'Student'))
+		)
+	do {
+		compare.debug('Courses_match'); 
+	}
+}
+
+
+rule match2Person { 
+	from
+		compare: compareMM!Match ( thisModule.checkConservative(compare, 'Person') and
+									not thisModule.checkContainerConflict(compare, 'Person'))
+	to
+		f: UUniverityMM!Person (
+			--attributes
+			Name <- thisModule.getAttributeOrigin(compare, 'Name')
+,			Email <- thisModule.getAttributeOrigin(compare, 'Email')
+,
+
+			--relations
+			relatives <- thisModule.getPerson_relatives(compare)
+		)
+	do {
+		compare.debug('Person_match'); 
+	}
+}
+
+
+rule match2University {
+	from
+		compare: compareMM!Match (thisModule.checkConservative(compare, 'University') )
+	to
+		uUniverity: UUniverityMM!University (
+			--relations
+			Courses <- thisModule.getUnchangedElementsByNameCollection(compare,
+					'Courses') -> append(thisModule.getAddedLeftCollection(compare,
+					'Courses')) -> append(thisModule.getAddedRightCollection(compare,
+					'Courses'))
+		)
+	do {
+		compare.debug('University_match'); 
+	}
+}
+
+
+rule match2uCourses {
+	from
+		compare: compareMM!Match ( thisModule.checkConservative(compare, 'uCourses') )
+	to
+		f: UUniverityMM!uCourses (
+
+			--attribute
+			name <- thisModule.getAttributeOrigin(compare, 'name'),
+
+			--relations
+			
+			uleft <- thisModule.getUnchangedElementsByNameCollection(compare, 'uleft') ->
+					append(thisModule.getAddedLeftCollection(compare, 'uleft')) ->
+					append(thisModule.getAddedRightCollection(compare, 'uleft')),
+			uright <- thisModule.getUnchangedElementsByNameCollection(compare, 'uright')
+					-> append(thisModule.getAddedLeftCollection(compare, 'uright')) ->
+					append(thisModule.getAddedRightCollection(compare, 'uright')),
+			upoint <- thisModule.getUnchangedElementsByNameCollection(compare, 'upoint')
+					-> append(thisModule.getAddedLeftCollection(compare, 'upoint')) ->
+					append(thisModule.getAddedRightCollection(compare, 'upoint'))
+		)
+	do {
+		compare.debug('uCourses_match'); 
+	}
+}
+
+
+rule match2uPerson {
+	from
+		compare: compareMM!Match ( thisModule.checkConservative(compare, 'uPerson') )
+	to
+		f: UUniverityMM!uPerson (
+
+			--attribute
+			name <- thisModule.getAttributeOrigin(compare, 'name'),
+
+			--relations
+			
+			uleft <- thisModule.getUnchangedElementsByNameCollection(compare, 'uleft') ->
+					append(thisModule.getAddedLeftCollection(compare, 'uleft')) ->
+					append(thisModule.getAddedRightCollection(compare, 'uleft')),
+			uright <- thisModule.getUnchangedElementsByNameCollection(compare, 'uright')
+					-> append(thisModule.getAddedLeftCollection(compare, 'uright')) ->
+					append(thisModule.getAddedRightCollection(compare, 'uright')),
+			upoint <- thisModule.getUnchangedElementsByNameCollection(compare, 'upoint')
+					-> append(thisModule.getAddedLeftCollection(compare, 'upoint')) ->
+					append(thisModule.getAddedRightCollection(compare, 'upoint'))
+		)
+	do {
+		compare.debug('uPerson_match'); 
+	}
+}
+
+
+rule match2uUniversity {
+	from
+		compare: compareMM!Match ( thisModule.checkConservative(compare, 'uUniversity') )
+	to
+		f: UUniverityMM!uUniversity (
+
+			--attribute
+			name <- thisModule.getAttributeOrigin(compare, 'name'),
+
+			--relations
+			
+			uleft <- thisModule.getUnchangedElementsByNameCollection(compare, 'uleft') ->
+					append(thisModule.getAddedLeftCollection(compare, 'uleft')) ->
+					append(thisModule.getAddedRightCollection(compare, 'uleft')),
+			uright <- thisModule.getUnchangedElementsByNameCollection(compare, 'uright')
+					-> append(thisModule.getAddedLeftCollection(compare, 'uright')) ->
+					append(thisModule.getAddedRightCollection(compare, 'uright')),
+			upoint <- thisModule.getUnchangedElementsByNameCollection(compare, 'upoint')
+					-> append(thisModule.getAddedLeftCollection(compare, 'upoint')) ->
+					append(thisModule.getAddedRightCollection(compare, 'upoint'))
+		)
+	do {
+		compare.debug('uUniversity_match'); 
+	}
+}
+
+------------------------------------ Matches 4 -- uMembers------------------------------------
+------------------------------------------ Added Left ----------------------------------------
+
+rule addedLeft2Courses {
+	from
+		compare: compareMM!Match ( thisModule.addedElementLeft(compare, 'Courses') )
+	to
+		f: UUniverityMM!Courses (
+			--attributes
+			Name <- thisModule.getAttribute(compare, 'lastName', 'left')
+,			CFU <- thisModule.getAttribute(compare, 'lastName', 'left')
+,			Semester <- thisModule.getAttribute(compare, 'lastName', 'left')
+,
+			--relations
+			links <- thisModule.getAddedLeftCollection(compare, 'links')
+,			Professor <- thisModule.getAddedLeftSingle(compare, 'Professor')
+,			Student <- thisModule.getAddedLeftCollection(compare, 'Student')
+		)
+	do {
+		compare.debug('Courses_add_L'); 
+	}
+}
+
+
+rule addedLeft2Person {
+	from
+		compare: compareMM!Match ( thisModule.addedElementLeft(compare, 'Person') )
+	to
+		f: UFamiliesMM!Person (
+			--attributes
+			Name <- thisModule.getAttribute(compare, 'Name', 'left')
+,			Email <- thisModule.getAttribute(compare, 'Email', 'left')
+,
+			--relations
+			relatives <- thisModule.getAddedLeftSingle(compare, 'relatives')
+		)
+	do {
+		compare.debug('Person_add_L'); 
+	}
+}
+
+
+rule addedLeft2University {
+	from
+		compare: compareMM!Match ( thisModule.addedElementLeft(compare, 'University') )
+	to
+		f: UUniverityMM!University (
+			--relations
+			Courses <- thisModule.getAddedLeftCollection(compare, 'Courses')
+		)
+	do {
+		compare.debug('University_add_L'); 
+	}
+}
+
+
+rule addedLeft2uCourses {
+	from
+		compare: compareMM!Match ( thisModule.addedElementLeft(compare, 'uCourses') )
+	to
+		f: UUniverityMM!uCourses (
+			
+			--attribute
+				Name <- thisModule.getAttribute(compare, 'Name', 'left')
+,				CFU <- thisModule.getAttribute(compare, 'CFU', 'left')
+,				Semester <- thisModule.getAttribute(compare, 'Semester', 'left')
+,
+
+			--relations			
+			uleft <- thisModule.getAddedLeftCollection(compare, 'uleft'),
+			uright <- thisModule.getAddedLeftCollection(compare, 'uright'),
+			upoint <- thisModule.getAddedLeftCollection(compare, 'upoint')
+		)
+	do {
+		compare.debug('uCourses_add_L'); 
+	}
+}
+
+
+rule addedLeft2uPerson {
+	from
+		compare: compareMM!Match ( thisModule.addedElementLeft(compare, 'uPerson') )
+	to
+		f: UUniverityMM!uPerson (
+			
+			--attribute
+				Name <- thisModule.getAttribute(compare, 'Name', 'left')
+,				Email <- thisModule.getAttribute(compare, 'Email', 'left')
+,
+
+			--relations			
+			uleft <- thisModule.getAddedLeftCollection(compare, 'uleft'),
+			uright <- thisModule.getAddedLeftCollection(compare, 'uright'),
+			upoint <- thisModule.getAddedLeftCollection(compare, 'upoint')
+		)
+	do {
+		compare.debug('uPerson_add_L'); 
+	}
+}
+
+
+rule addedLeft2uUniversity {
+	from
+		compare: compareMM!Match ( thisModule.addedElementLeft(compare, 'uUniversity') )
+	to
+		f: UUniverityMM!uUniversity (
+			
+			--attribute
+
+			--relations			
+			uleft <- thisModule.getAddedLeftCollection(compare, 'uleft'),
+			uright <- thisModule.getAddedLeftCollection(compare, 'uright'),
+			upoint <- thisModule.getAddedLeftCollection(compare, 'upoint')
+		)
+	do {
+		compare.debug('uUniversity_add_L'); 
+	}
+}
+
+------------------------------------ Added Left ------------------------------------
+------------------------------------ Added Right ------------------------------------
+
+rule addedRight2Courses {
+	from
+		compare: compareMM!Match ( thisModule.addedElementRight(compare, 'Courses') )
+	to
+		f: UUniverityMM!Courses (
+			--attributes
+			Name <- thisModule.getAttribute(compare, 'lastName', 'right')
+,			CFU <- thisModule.getAttribute(compare, 'lastName', 'right')
+,			Semester <- thisModule.getAttribute(compare, 'lastName', 'right')
+,
+			--relations
+			links <- thisModule.getAddedRightCollection(compare, 'links')
+,			Professor <- thisModule.getAddedRightSingle(compare, 'Professor')
+,			Student <- thisModule.getAddedRightCollection(compare, 'Student')
+		)
+	do {
+		compare.debug('Courses_add_R'); 
+	}
+}
+
+
+rule addedRight2Person {
+	from
+		compare: compareMM!Match ( thisModule.addedElementRight(compare, 'Person') )
+	to
+		f: UUniverityMM!Person (
+			--attributes
+			Name <- thisModule.getAttribute(compare, 'Name', 'right')
+,			Email <- thisModule.getAttribute(compare, 'Email', 'right')
+,
+			--relations
+			relatives <- thisModule.getAddedRightSingle(compare, 'relatives')
+		)
+	do {
+		compare.debug('Person_add_R'); 
+	}
+}
+
+
+rule addedRight2University {
+	from
+		compare: compareMM!Match ( thisModule.addedElementRight(compare, 'University') )
+	to
+		f: UUniverityMM!University (
+			--relations
+			Courses <- thisModule.getAddedRightCollection(compare, 'Courses')
+		)
+	do {
+		compare.debug('University_add_R'); 
+	}
+}
+
+
+rule addedRight2uCourses {
+	from
+		compare: compareMM!Match ( thisModule.addedElementRight(compare, 'uCourses') )
+	to
+		f: UUniverityMM!uCourses (
+
+			--attribute
+				Name <- thisModule.getAttribute(compare, 'Name', 'right')
+,				CFU <- thisModule.getAttribute(compare, 'CFU', 'right')
+,				Semester <- thisModule.getAttribute(compare, 'Semester', 'right')
+,
+
+			--relations			
+			uleft <- thisModule.getAddedRightCollection(compare, 'uleft'),
+			uright <- thisModule.getAddedRightCollection(compare, 'uright'),
+			upoint <- thisModule.getAddedRightCollection(compare, 'upoint')
+		)
+	do {
+		compare.debug('uCourses_add_R'); 
+	}
+}
+
+
+rule addedRight2uPerson {
+	from
+		compare: compareMM!Match ( thisModule.addedElementRight(compare, 'uPerson') )
+	to
+		f: UUniverityMM!uPerson (
+
+			--attribute
+				Name <- thisModule.getAttribute(compare, 'Name', 'right')
+,				Email <- thisModule.getAttribute(compare, 'Email', 'right')
+,
+
+			--relations			
+			uleft <- thisModule.getAddedRightCollection(compare, 'uleft'),
+			uright <- thisModule.getAddedRightCollection(compare, 'uright'),
+			upoint <- thisModule.getAddedRightCollection(compare, 'upoint')
+		)
+	do {
+		compare.debug('uPerson_add_R'); 
+	}
+}
+
+
+rule addedRight2uUniversity {
+	from
+		compare: compareMM!Match ( thisModule.addedElementRight(compare, 'uUniversity') )
+	to
+		f: UUniverityMM!uUniversity (
+
+			--attribute
+
+			--relations			
+			uleft <- thisModule.getAddedRightCollection(compare, 'uleft'),
+			uright <- thisModule.getAddedRightCollection(compare, 'uright'),
+			upoint <- thisModule.getAddedRightCollection(compare, 'upoint')
+		)
+	do {
+		compare.debug('uUniversity_add_R'); 
+	}
+}
+
+------------------------------------ Added Right ------------------------------------
+
+rule changeLeftandRight2Courses {
+	from compare: compareMM!Match (
+		(thisModule.changedAttributesLeft(compare, 'Courses') and thisModule.changedAttributesRight(compare, 'Courses'))
+		or
+		(thisModule.changedReferenceLeft(compare, 'Courses') and thisModule.changedReferenceRight(compare, 'Courses'))
+		)
+	to
+		f: UUniverityMM!Courses (
+			--attribute
+			Name <- thisModule.getAttribute(compare, 'Name', 'origin')
+,			CFU <- thisModule.getAttribute(compare, 'CFU', 'origin')
+,			Semester <- thisModule.getAttribute(compare, 'Semester', 'origin')
+,
+			--relations
+			links <- thisModule.getUnchangedElementsByNameCollection(compare, 'links') ->
+					append(thisModule.getAddedLeftCollection(compare, 'links')) ->
+					append(thisModule.getAddedRightCollection(compare, 'links'))
+,			Professor <- thisModule.getUnchangedElementsByNameSingle(compare, 'Professor')
+,			Student <- thisModule.getUnchangedElementsByNameCollection(compare, 'Student') ->
+					append(thisModule.getAddedLeftCollection(compare, 'Student')) ->
+					append(thisModule.getAddedRightCollection(compare, 'Student'))
+		)
+	do {
+		compare.debug('changes2Courses'); 
+	}
+}
+
+
+
+
+
+------------------------------------ Changed Left ------------------------------------
+
+rule changeLeft2Courses {
+	from
+		compare: compareMM!Match ( 
+			(thisModule.changedAttributesLeft(compare, 'Courses') and not thisModule.changedAttributesRight(compare, 'Courses'))
+			or 
+			(thisModule.changedReferenceLeft(compare, 'Courses') and not thisModule.changedReferenceRight(compare, 'Courses'))
+			)
+	to
+		f: UUniverityMM!Courses (
+			--attribute
+			Name <- thisModule.getAttribute(compare, 'Name', 'left')
+,			CFU <- thisModule.getAttribute(compare, 'CFU', 'left')
+,			Semester <- thisModule.getAttribute(compare, 'Semester', 'left')
+,
+
+			--relations
+			links <- thisModule.getUnchangedElementsByNameCollection(compare,
+					'links') -> append(thisModule.getAddedLeftCollection(compare,
+					'links')) -> append(thisModule.getAddedRightCollection(compare,
+					'links'))
+,			Professor <- thisModule.getUnchangedElementsByNameSingle(compare, 'Professor')
+,			Student <- thisModule.getUnchangedElementsByNameCollection(compare,
+					'Student') -> append(thisModule.getAddedLeftCollection(compare,
+					'Student')) -> append(thisModule.getAddedRightCollection(compare,
+					'Student'))
+		)
+	do {
+		compare.debug('Courses_changed_L'); 
+	}
+}
+
+
+rule changeLeft2Person {
+	from
+		compare: compareMM!Match ( thisModule.changedAttributesLeft(compare, 'Member') or 
+			thisModule.changedReferenceLeft(compare, 'Member') )
+	to
+		f: UUniverityMM!Person (
+			Name <- thisModule.getAttribute(compare, 'Name', 'left')
+,			Email <- thisModule.getAttribute(compare, 'Email', 'left')
+,
+			--relations
+			relatives <- thisModule.getPerson_relatives(compare)
+		)
+	do {
+		compare.debug('Person_changed_L'); 
+	}
+}
+
+
+rule changeLeft2University {
+	from
+		compare: compareMM!Match ( thisModule.changedAttributesLeft(compare, 'University') or 
+			thisModule.changedReferenceLeft(compare, 'University') )
+	to
+		f: UUniverityMM!University (
+			--relations
+			Courses <- thisModule.getAddedLeftCollection(compare, 'Courses')
+		)
+	do {
+		compare.debug('University_changed_L'); 
+	}
+}
+
+------------------------------------ Changed Left -------------------------------------
+------------------------------------ Changed Right ------------------------------------
+
+rule changeRight2Courses {
+	from
+		compare: compareMM!Match (
+			(thisModule.changedAttributesRight(compare, 'Courses') and not thisModule.changedAttributesLeft(compare, 'Courses')) 
+			or 
+			(thisModule.changedReferenceRight(compare, 'Courses') and not thisModule.changedReferenceLeft(compare, 'Courses'))
+			)
+	to
+		f: UUniverityMM!Courses (
+			--attribute
+			Name <- thisModule.getAttribute(compare, 'Name', 'right')
+,			CFU <- thisModule.getAttribute(compare, 'CFU', 'right')
+,			Semester <- thisModule.getAttribute(compare, 'Semester', 'right')
+,
+			
+			--relations
+			links <- thisModule.getUnchangedElementsByNameCollection(compare, 'links') ->
+					append(thisModule.getAddedLeftCollection(compare, 'links')) ->
+					append(thisModule.getAddedRightCollection(compare, 'links'))
+,			Professor <- thisModule.getUnchangedElementsByNameSingle(compare, 'Professor')
+,			Student <- thisModule.getUnchangedElementsByNameCollection(compare, 'Student') ->
+					append(thisModule.getAddedLeftCollection(compare, 'Student')) ->
+					append(thisModule.getAddedRightCollection(compare, 'Student'))
+		)
+	do {
+		compare.debug('Courses_changed_R'); 
+	}
+}
+
+
+
+rule changeRight2Person {
+	from
+		compare: compareMM!Match (
+			thisModule.changedAttributesRight(compare, 'Person') or thisModule.
+					changedReferenceRight(compare, 'Person')
+		)
+	to
+		f: UUniverityMM!Person (
+			--attribute
+			Name <- thisModule.getAttribute(compare, 'Name', 'right')
+,			Email <- thisModule.getAttribute(compare, 'Email', 'right')
+,
+
+			--relations
+			relatives <- thisModule.getPerson_relatives(compare, 'relatives', 'right')
+		)
+	do {
+		compare.debug('Person_changed_R'); 
+	}
+}
+
+
+
+rule changeRight2University {
+	from
+		compare: compareMM!Match ( thisModule.changedAttributesRight(compare, 'University') or 
+			thisModule.changedReferenceRight(compare, 'University') )
+	to
+		f: UUniverityMM!University (
+			--relations
+			Courses <- thisModule.getAddedRightCollection(compare, 'Courses')
+		)
+	do {
+		compare.debug('University_changed_R'); 
+	}
+}
+
+
+------------------------------------ Changed Right ------------------------------------
+-------------------------------------- Conflicts --------------------------------------
+
+rule ConflictACourses {
+	from
+		compare: compareMM!Match (
+			thisModule.conflictingAttributes(compare, 'Courses') or thisModule.
+					conflictingReference(compare, 'Courses')
+		)
+	to
+		f: UUniverityMM!uCourses (
+			uleft <- left,
+			uright <- right,
+			utype <- #OR
+		),
+		left: UUniverityMM!Courses (
+			--attributes
+			Name <- thisModule.getAttribute(compare, 'Name', 'left')
+,			CFU <- thisModule.getAttribute(compare, 'CFU', 'left')
+,			Semester <- thisModule.getAttribute(compare, 'Semester', 'left')
+,
+			
+			--relations
+			links <- compare.origin.links -> collect(e |thisModule.cloneMembers(e))
+,			Professor <- thisModule.cloneMembers(compare.origin.Professor)
+,			Student <- compare.origin.Student -> collect(e |thisModule.cloneMembers(e))
+		),
+		right: UUniverityMM!Courses (
+			--attributes
+			Name <- thisModule.getAttribute(compare, 'Name', 'right')
+,			CFU <- thisModule.getAttribute(compare, 'CFU', 'right')
+,			Semester <- thisModule.getAttribute(compare, 'Semester', 'right')
+,
+			
+			--relations
+			links <- compare.origin.links -> collect(e |thisModule.cloneMembers(e))
+,			Professor <- thisModule.cloneMembers(compare.origin.Professor)
+,			Student <- compare.origin.Student -> collect(e |thisModule.cloneMembers(e))
+		)
+	do {
+		compare.debug('Courses_conflict'); 
+	}
+}
+
+
+rule ConflictAPerson {
+	from
+		match: compareMM!Match (
+			thisModule.conflictingAttributes(match, 'Person') or thisModule.
+					conflictingReference(match, 'Person')
+		)
+	to
+		f: UUniverityMM!uPerson (
+			uleft <- left,
+			uright <- right,
+			utype <- #OR
+		),
+		left: UUniverityMM!Person (
+			--attribute
+			Name <- thisModule.getAttribute(match, 'Name', 'left')
+,			Email <- thisModule.getAttribute(match, 'Email', 'left')
+,
+
+			--relations
+			relatives <- thisModule.getReference(match, 'relatives', 'left')
+		),
+		right: UUniverityMM!Person (
+			--attribute
+			Name <- thisModule.getAttribute(match, 'Name', 'right')
+,			Email <- thisModule.getAttribute(match, 'Email', 'right')
+,
+			
+			--relations
+			relatives <- thisModule.getReference(match, 'relatives', 'right')
+		)
+	do {
+		match.debug('Person_conflict'); 
+	}
+}
+
+
+
+------------------------------------ Lazy rule --------------------------------------
+
+
+
+lazy rule clonePerson {
+	from 
+		compare: UUniverityMM!Person (
+			thisModule.checkConservative(compare, 'Person') 
+		)
+	to 
+		Person: UUniverityMM!Person (
+			--attributes
+			Name <- compare.Name
+,			Email <- compare.Email
+		)
+	do {
+		compare.debug('Person_clone'); 
+	}
+}
+
+

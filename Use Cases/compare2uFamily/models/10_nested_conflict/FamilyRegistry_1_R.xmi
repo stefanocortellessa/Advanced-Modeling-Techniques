@@ -28,6 +28,6 @@
       lastName="Di Francesco">
     <sons xsi:type="Families:Member"
         firstName="Stefano"
-        age="25"/>
+        age="27"/>
   </families>
 </Families:FamilyRegistry>

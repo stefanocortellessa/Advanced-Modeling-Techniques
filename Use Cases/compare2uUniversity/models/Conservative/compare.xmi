@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="ASCII"?>
+<compare:Comparison xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:compare="http://www.eclipse.org/emf/compare" threeWay="true">
+  <matchedResources leftURI="platform:/resource/compare2uUniversity/models/Conservative/University_L.xmi"/>
+  <matchedResources rightURI="platform:/resource/compare2uUniversity/models/Conservative/University_R.xmi"/>
+  <matchedResources originURI="platform:/resource/compare2uUniversity/models/Conservative/University_O.xmi"/>
+  <matches>
+    <submatches>
+      <submatches>
+        <left href="platform:/resource/compare2uUniversity/models/Conservative/University_L.xmi#//@Courses.1/@Professor"/>
+        <right href="platform:/resource/compare2uUniversity/models/Conservative/University_R.xmi#//@Courses.1/@Professor"/>
+        <origin href="platform:/resource/compare2uUniversity/models/Conservative/University_O.xmi#//@Courses.1/@Professor"/>
+      </submatches>
+      <left href="platform:/resource/compare2uUniversity/models/Conservative/University_L.xmi#//@Courses.1"/>
+      <right href="platform:/resource/compare2uUniversity/models/Conservative/University_R.xmi#//@Courses.1"/>
+      <origin href="platform:/resource/compare2uUniversity/models/Conservative/University_O.xmi#//@Courses.1"/>
+    </submatches>
+    <submatches>
+      <submatches>
+        <left href="platform:/resource/compare2uUniversity/models/Conservative/University_L.xmi#//@Courses.0/@Professor"/>
+        <right href="platform:/resource/compare2uUniversity/models/Conservative/University_R.xmi#//@Courses.0/@Professor"/>
+        <origin href="platform:/resource/compare2uUniversity/models/Conservative/University_O.xmi#//@Courses.0/@Professor"/>
+      </submatches>
+      <left href="platform:/resource/compare2uUniversity/models/Conservative/University_L.xmi#//@Courses.0"/>
+      <right href="platform:/resource/compare2uUniversity/models/Conservative/University_R.xmi#//@Courses.0"/>
+      <origin href="platform:/resource/compare2uUniversity/models/Conservative/University_O.xmi#//@Courses.0"/>
+    </submatches>
+    <left href="platform:/resource/compare2uUniversity/models/Conservative/University_L.xmi#/"/>
+    <right href="platform:/resource/compare2uUniversity/models/Conservative/University_R.xmi#/"/>
+    <origin href="platform:/resource/compare2uUniversity/models/Conservative/University_O.xmi#/"/>
+  </matches>
+</compare:Comparison>
