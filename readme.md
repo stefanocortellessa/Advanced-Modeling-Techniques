@@ -1,4 +1,4 @@
-The project is organized as follow:
+**Folder Organization**
 
 - The root folder is NOMECARTELLA 
   - HOT trasformation (**Acceleo** Code)
@@ -15,15 +15,17 @@ The project is organized as follow:
       - Metamodels
       - Models 
       - Transformation
-      
-Taking into account the two Use Cases, to run them is necessary to know how to run the transformations (Run Configurations Settings):
+   
+**Run Configuration**
+
+Taking into account the **two _Use Cases_**, to run them is necessary to know how to run the transformations:
 - **ATL code** is in *'Transformation'* folder (e.g. compare2Ufamily.atl)
 - **Metamodels** are in *'Metamodels'* folder (e.g. Compare.ecore and UFamily.ecore)
 - **Source Models** are located in the *'Models'* folder, in the sub-folder *'Case n'*. For each sub-folder there is a compare.xmi model that represent the source model for that case
 - **Target Model** is in the *'Transformation'* folder (e.g. out.xmi)
 
 
-Taking into account the HOT Transformation, to run it is necessary to know how to run the code (Run Configurations Settings):
+Taking into account the **_HOT_ Transformation**, to run it is necessary to know how to run the code:
 
 - **Project** : HighOrder
 - **Main Class** : HighOrder.main.Generate
