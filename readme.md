@@ -2,7 +2,7 @@
  
 - HighOrder (HOT transformation, **Acceleo** Code)
 - Use Cases (**ATL** Projects)
-  - **Families Case**
+  - **compare2uFamily*
     - Metamodels
     - Models 
       - Case1
@@ -10,7 +10,7 @@
       - ...
       - CaseN
     - Transformation
-  - **University Case**
+  - **compare2uUniversity**
     - Metamodels
     - Models 
     - Transformation
