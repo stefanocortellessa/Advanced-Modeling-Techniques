@@ -1,4 +1,4 @@
-## Folder Organization
+## Folders Organization
  
 - HOT trasformation (**Acceleo** Code)
 - Use Cases (**ATL** Projects)
