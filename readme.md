@@ -1,6 +1,6 @@
 ## Folders Organization
  
-- HOT trasformation (**Acceleo** Code)
+- HighOrder (HOT transformation, **Acceleo** Code)
 - Use Cases (**ATL** Projects)
   - **Families Case**
     - Metamodels
